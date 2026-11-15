@@ -1,0 +1,681 @@
+
+{% extends "base.html" %}
+
+{% block title %}Manage Emergency Facilities | CiviSphere{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* =========================================
+       ADMIN PAGE
+    ========================================= */
+
+    .admin-page {
+        padding: 30px 0 50px;
+        color: var(--text-color, #1e293b);
+    }
+
+    .admin-header {
+        background: linear-gradient(135deg, #1e293b, #334155);
+        color: #ffffff;
+        padding: 30px;
+        border-radius: 18px;
+        margin-bottom: 25px;
+    }
+
+    .admin-header h1 {
+        font-size: 28px;
+        font-weight: 800;
+        margin-bottom: 8px;
+    }
+
+    .admin-header p {
+        color: #e2e8f0;
+        margin: 0;
+    }
+
+    .top-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-bottom: 22px;
+    }
+
+    .admin-heading {
+        color: var(--text-color, #1e293b);
+        font-size: 21px;
+        font-weight: 750;
+        margin-bottom: 5px;
+    }
+
+    .record-count {
+        color: var(--muted-text, #64748b);
+        margin: 0;
+        font-size: 14px;
+    }
+
+    /* =========================================
+       ADD BUTTON
+    ========================================= */
+
+    .add-button {
+        display: inline-block;
+        background: #16a34a;
+        color: #ffffff;
+        padding: 12px 18px;
+        border-radius: 9px;
+        text-decoration: none;
+        font-weight: 700;
+        transition: 0.2s;
+    }
+
+    .add-button:hover {
+        background: #15803d;
+        color: #ffffff;
+        text-decoration: none;
+        transform: translateY(-2px);
+    }
+
+    /* =========================================
+       TABLE CARD
+    ========================================= */
+
+    .table-card {
+        background: var(--card-bg, #ffffff);
+        border: 1px solid var(--border-color, #e2e8f0);
+        border-radius: 15px;
+        padding: 20px;
+        overflow-x: auto;
+        box-shadow: var(--shadow, 0 4px 15px rgba(15,23,42,0.04));
+    }
+
+    .facility-table {
+        width: 100%;
+        min-width: 1050px;
+        border-collapse: collapse;
+    }
+
+    .facility-table th {
+        background: var(--input-bg, #eff6ff);
+        color: var(--text-color, #1e293b);
+        padding: 14px 12px;
+        text-align: left;
+        font-size: 13px;
+        white-space: nowrap;
+    }
+
+    .facility-table td {
+        padding: 14px 12px;
+        border-bottom: 1px solid var(--border-color, #e2e8f0);
+        color: var(--muted-text, #475569);
+        font-size: 13px;
+        vertical-align: middle;
+    }
+
+    .facility-table td strong {
+        color: var(--text-color, #1e293b);
+    }
+
+    .facility-table small {
+        color: var(--muted-text, #64748b);
+    }
+
+    .facility-table tbody tr:hover td {
+        background: var(--input-bg, #f8fafc);
+    }
+
+    /* =========================================
+       STATUS BADGES
+    ========================================= */
+
+    .status {
+        display: inline-block;
+        padding: 5px 9px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 750;
+        white-space: nowrap;
+    }
+
+    .verified {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .unverified {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    .active {
+        background: #dbeafe;
+        color: #1d4ed8;
+    }
+
+    .inactive {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+
+    /* =========================================
+       ACTION BUTTONS
+    ========================================= */
+
+    .action-buttons {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        flex-wrap: wrap;
+    }
+
+    .action-buttons form {
+        margin: 0;
+    }
+
+    .action-button {
+        display: inline-block;
+        border: none;
+        border-radius: 7px;
+        padding: 7px 10px;
+        font-size: 11px;
+        font-weight: 700;
+        cursor: pointer;
+        text-decoration: none;
+        white-space: nowrap;
+        transition: 0.2s;
+    }
+
+    .action-button:hover {
+        opacity: 0.85;
+        transform: translateY(-1px);
+    }
+
+    .edit-button {
+        background: #dbeafe;
+        color: #1d4ed8;
+    }
+
+    .verify-button {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .deactivate-button {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+
+    .activate-button {
+        background: #d1fae5;
+        color: #065f46;
+    }
+
+    /* =========================================
+       EMPTY STATE
+    ========================================= */
+
+    .empty-state {
+        text-align: center;
+        padding: 45px 15px;
+        color: var(--muted-text, #64748b);
+    }
+
+    .empty-state h3 {
+        color: var(--text-color, #1e293b);
+        margin: 12px 0 8px;
+    }
+
+    /* =========================================
+       DARK MODE
+       Palette:
+       Background: #000000
+       Cards:      #171717
+       Surfaces:   #262626
+       Borders:    #303030
+       Text:       #ffffff
+    ========================================= */
+
+    [data-theme="dark"] .admin-page {
+        color: #ffffff !important;
+    }
+
+    [data-theme="dark"] .admin-header {
+        background: #171717 !important;
+        border: 1px solid #303030;
+        color: #ffffff !important;
+    }
+
+    [data-theme="dark"] .admin-header h1 {
+        color: #ffffff !important;
+    }
+
+    [data-theme="dark"] .admin-header p {
+        color: #b3b3b3 !important;
+    }
+
+    [data-theme="dark"] .admin-heading,
+    [data-theme="dark"] .facility-table td strong,
+    [data-theme="dark"] .empty-state h3 {
+        color: #ffffff !important;
+    }
+
+    [data-theme="dark"] .record-count,
+    [data-theme="dark"] .facility-table td,
+    [data-theme="dark"] .facility-table small,
+    [data-theme="dark"] .empty-state {
+        color: #b3b3b3 !important;
+    }
+
+    [data-theme="dark"] .table-card {
+        background: #171717 !important;
+        border: 1px solid #303030 !important;
+        box-shadow: none !important;
+    }
+
+    [data-theme="dark"] .facility-table {
+        background: #171717 !important;
+    }
+
+    [data-theme="dark"] .facility-table th {
+        background: #262626 !important;
+        color: #ffffff !important;
+        border-color: #303030 !important;
+    }
+
+    [data-theme="dark"] .facility-table td {
+        background: #171717 !important;
+        color: #b3b3b3 !important;
+        border-bottom: 1px solid #303030 !important;
+    }
+
+    [data-theme="dark"] .facility-table td strong {
+        color: #ffffff !important;
+    }
+
+    [data-theme="dark"] .facility-table tbody tr:hover td {
+        background: #262626 !important;
+    }
+
+    /* DARK STATUS BADGES */
+
+    [data-theme="dark"] .status.verified {
+        background: #183b2b !important;
+        color: #86efac !important;
+    }
+
+    [data-theme="dark"] .status.unverified {
+        background: #3d3215 !important;
+        color: #fcd34d !important;
+    }
+
+    [data-theme="dark"] .status.active {
+        background: #172f46 !important;
+        color: #93c5fd !important;
+    }
+
+    [data-theme="dark"] .status.inactive {
+        background: #451a1a !important;
+        color: #fca5a5 !important;
+    }
+
+    /* DARK ACTION BUTTONS */
+
+    [data-theme="dark"] .edit-button {
+        background: #262626 !important;
+        color: #93c5fd !important;
+        border: 1px solid #303030;
+    }
+
+    [data-theme="dark"] .verify-button,
+    [data-theme="dark"] .activate-button {
+        background: #183b2b !important;
+        color: #86efac !important;
+    }
+
+    [data-theme="dark"] .deactivate-button {
+        background: #451a1a !important;
+        color: #fca5a5 !important;
+    }
+
+    /* DARK SUCCESS / FLASH MESSAGES */
+
+    [data-theme="dark"] .alert,
+    [data-theme="dark"] .alert-success,
+    [data-theme="dark"] .flash-message.success,
+    [data-theme="dark"] .flash-success {
+        background: #183b2b !important;
+        color: #86efac !important;
+        border: 1px solid #166534 !important;
+        box-shadow: none !important;
+    }
+
+    [data-theme="dark"] .alert-warning,
+    [data-theme="dark"] .flash-message.warning {
+        background: #3d3215 !important;
+        color: #fcd34d !important;
+        border: 1px solid #66521b !important;
+    }
+
+    [data-theme="dark"] .alert-danger,
+    [data-theme="dark"] .flash-message.danger {
+        background: #451a1a !important;
+        color: #fca5a5 !important;
+        border: 1px solid #7f1d1d !important;
+    }
+
+    [data-theme="dark"] .alert-info,
+    [data-theme="dark"] .flash-message.info {
+        background: #172f46 !important;
+        color: #93c5fd !important;
+        border: 1px solid #1e40af !important;
+    }
+
+    /* =========================================
+       RESPONSIVE DESIGN
+    ========================================= */
+
+    @media (max-width: 600px) {
+        .admin-page {
+            padding-top: 20px;
+        }
+
+        .admin-header {
+            padding: 23px 18px;
+        }
+
+        .admin-header h1 {
+            font-size: 23px;
+        }
+
+        .table-card {
+            padding: 12px;
+        }
+
+        .top-actions {
+            align-items: flex-start;
+        }
+    }
+</style>
+{% endblock %}
+
+
+{% block content %}
+
+<div class="admin-page">
+
+    <!-- PAGE HEADER -->
+    <section class="admin-header">
+
+        <h1>Emergency Facility Management</h1>
+
+        <p>
+            Manage emergency facilities, update information
+            and verify listings across India.
+        </p>
+
+    </section>
+
+
+    <!-- TOP ACTIONS -->
+    <div class="top-actions">
+
+        <div>
+
+            <h2 class="admin-heading">
+                All Emergency Facilities
+            </h2>
+
+            <p class="record-count">
+                Total records: {{ services|length }}
+            </p>
+
+        </div>
+
+        <a href="{{ url_for('emergency_services.admin_add') }}"
+           class="add-button">
+
+            + Add New Facility
+
+        </a>
+
+    </div>
+
+
+    <!-- FACILITY TABLE -->
+    <section class="table-card">
+
+        {% if services %}
+
+        <table class="facility-table">
+
+            <thead>
+
+                <tr>
+                    <th>ID</th>
+                    <th>Facility Name</th>
+                    <th>Category</th>
+                    <th>Location</th>
+                    <th>Verification</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+                {% for service in services %}
+
+                <tr>
+
+                    <!-- ID -->
+                    <td>
+                        {{ service.service_id }}
+                    </td>
+
+
+                    <!-- FACILITY NAME -->
+                    <td>
+
+                        <strong>
+                            {{ service.service_name }}
+                        </strong>
+
+                        {% if service.subcategory %}
+
+                            <br>
+
+                            <small>
+                                {{ service.subcategory }}
+                            </small>
+
+                        {% endif %}
+
+                    </td>
+
+
+                    <!-- CATEGORY -->
+                    <td>
+                        {{ service.category }}
+                    </td>
+
+
+                    <!-- LOCATION -->
+                    <td>
+
+                        {{ service.city or "N/A" }},
+                        {{ service.district or "N/A" }},
+                        {{ service.state }}
+
+                    </td>
+
+
+                    <!-- VERIFICATION STATUS -->
+                    <td>
+
+                        {% if service.is_verified %}
+
+                            <span class="status verified">
+                                Verified
+                            </span>
+
+                        {% else %}
+
+                            <span class="status unverified">
+                                Not Verified
+                            </span>
+
+                        {% endif %}
+
+                    </td>
+
+
+                    <!-- ACTIVE STATUS -->
+                    <td>
+
+                        {% if service.is_active %}
+
+                            <span class="status active">
+                                Active
+                            </span>
+
+                        {% else %}
+
+                            <span class="status inactive">
+                                Inactive
+                            </span>
+
+                        {% endif %}
+
+                    </td>
+
+
+                    <!-- ACTION BUTTONS -->
+                    <td>
+
+                        <div class="action-buttons">
+
+                            <!-- EDIT -->
+                            <a class="action-button edit-button"
+                               href="{{ url_for(
+                                   'emergency_services.admin_edit',
+                                   service_id=service.service_id
+                               ) }}">
+
+                                Edit
+
+                            </a>
+
+
+                            <!-- VERIFY / UNVERIFY -->
+                            <form method="POST"
+                                  action="{{ url_for(
+                                      'emergency_services.admin_verify',
+                                      service_id=service.service_id
+                                  ) }}"
+                                  onsubmit="return confirm('Change verification status?');">
+
+                                <input type="hidden"
+                                       name="csrf_token"
+                                       value="{{ csrf_token() }}">
+
+                                <button type="submit"
+                                        class="action-button verify-button">
+
+                                    {% if service.is_verified %}
+                                        Unverify
+                                    {% else %}
+                                        Verify
+                                    {% endif %}
+
+                                </button>
+
+                            </form>
+
+
+                            <!-- DEACTIVATE / ACTIVATE -->
+                            {% if service.is_active %}
+
+                                <form method="POST"
+                                      action="{{ url_for(
+                                          'emergency_services.admin_deactivate',
+                                          service_id=service.service_id
+                                      ) }}"
+                                      onsubmit="return confirm('Are you sure you want to deactivate this facility?');">
+
+                                    <input type="hidden"
+                                           name="csrf_token"
+                                           value="{{ csrf_token() }}">
+
+                                    <button type="submit"
+                                            class="action-button deactivate-button">
+
+                                        Deactivate
+
+                                    </button>
+
+                                </form>
+
+                            {% else %}
+
+                                <form method="POST"
+                                      action="{{ url_for(
+                                          'emergency_services.admin_activate',
+                                          service_id=service.service_id
+                                      ) }}"
+                                      onsubmit="return confirm('Do you want to reactivate this facility?');">
+
+                                    <input type="hidden"
+                                           name="csrf_token"
+                                           value="{{ csrf_token() }}">
+
+                                    <button type="submit"
+                                            class="action-button activate-button">
+
+                                        Activate
+
+                                    </button>
+
+                                </form>
+
+                            {% endif %}
+
+                        </div>
+
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+
+        {% else %}
+
+        <!-- EMPTY STATE -->
+        <div class="empty-state">
+
+            <div style="font-size:42px;">
+                🏥
+            </div>
+
+            <h3>No Facilities Added Yet</h3>
+
+            <p>
+                Add your first emergency facility to get started.
+            </p>
+
+        </div>
+
+        {% endif %}
+
+    </section>
+
+</div>
+
+{% endblock %}

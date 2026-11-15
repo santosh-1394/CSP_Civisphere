@@ -1,0 +1,71 @@
+
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container" style="max-width:650px; margin:40px auto;">
+
+    <h1>Add Important Contact</h1>
+    <p>Enter public-service contact information.</p>
+
+    <form method="POST"
+          action="{{ url_for('contacts.add_contact') }}">
+
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+        <div style="margin-bottom:20px;">
+            <label>Contact Name *</label>
+            <input type="text"
+                   name="contact_name"
+                   maxlength="100"
+                   required
+                   placeholder="Example: Fire Station"
+                   style="width:100%; padding:12px; margin-top:8px;">
+        </div>
+
+        <div style="margin-bottom:20px;">
+            <label>Category</label>
+            <select name="category"
+                    style="width:100%; padding:12px; margin-top:8px;">
+                <option value="">Select Category</option>
+                <option value="Police">Police</option>
+                <option value="Medical">Medical</option>
+                <option value="Fire Services">Fire Services</option>
+                <option value="Government">Government</option>
+                <option value="Utilities">Utilities</option>
+                <option value="Other">Other</option>
+            </select>
+        </div>
+
+        <div style="margin-bottom:20px;">
+            <label>Phone Number *</label>
+            <input type="tel"
+                   name="phone"
+                   maxlength="15"
+                   required
+                   placeholder="Enter phone number"
+                   style="width:100%; padding:12px; margin-top:8px;">
+        </div>
+
+        <div style="margin-bottom:20px;">
+            <label>Address</label>
+            <textarea name="address"
+                      rows="4"
+                      placeholder="Enter contact address"
+                      style="width:100%; padding:12px; margin-top:8px;"></textarea>
+        </div>
+
+        <button type="submit" style="padding:12px 25px;">
+            Save Contact
+        </button>
+
+        <a href="{{ url_for('contacts.contact_list') }}"
+           style="margin-left:15px;">
+            Cancel
+        </a>
+
+    </form>
+
+</div>
+
+{% endblock %}

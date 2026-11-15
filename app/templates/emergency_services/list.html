@@ -1,0 +1,583 @@
+
+{% extends "base.html" %}
+
+{% block title %}{{ category }} | CiviSphere{% endblock %}
+
+{% block extra_css %}
+<style>
+    .directory-page {
+        padding: 30px 0 50px;
+    }
+
+    .directory-header {
+        background: linear-gradient(135deg, #123b78, #1674d1);
+        color: white;
+        padding: 35px;
+        border-radius: 18px;
+        margin-bottom: 25px;
+    }
+
+    .directory-header h1 {
+        font-size: 30px;
+        font-weight: 800;
+        margin-bottom: 8px;
+    }
+
+    .directory-header p {
+        margin: 0;
+        color: #eaf3ff;
+    }
+
+    .back-link {
+        display: inline-block;
+        color: #1674d1;
+        font-weight: 700;
+        text-decoration: none;
+        margin-bottom: 20px;
+    }
+
+    .filter-panel {
+        background: white;
+        border: 1px solid #e2e8f0;
+        padding: 22px;
+        border-radius: 15px;
+        margin-bottom: 28px;
+        box-shadow: 0 4px 15px rgba(15, 23, 42, 0.04);
+    }
+
+    .filter-panel h3 {
+        font-size: 18px;
+        color: #173b70;
+        font-weight: 750;
+        margin-bottom: 18px;
+    }
+
+    .filter-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr 1fr auto;
+        gap: 12px;
+        align-items: end;
+    }
+
+    .filter-field label {
+        display: block;
+        font-size: 13px;
+        font-weight: 700;
+        color: #475569;
+        margin-bottom: 7px;
+    }
+
+    .filter-field input {
+        width: 100%;
+        padding: 11px 12px;
+        border: 1px solid #cbd5e1;
+        border-radius: 9px;
+        outline: none;
+        box-sizing: border-box;
+    }
+
+    .filter-field input:focus {
+        border-color: #1674d1;
+        box-shadow: 0 0 0 3px rgba(22, 116, 209, 0.1);
+    }
+
+    .filter-button {
+        background: #1674d1;
+        color: white;
+        border: none;
+        border-radius: 9px;
+        padding: 12px 20px;
+        font-weight: 700;
+        cursor: pointer;
+    }
+
+    .filter-button:hover {
+        background: #125ca8;
+    }
+
+    .clear-button {
+        display: inline-block;
+        margin-top: 15px;
+        color: #64748b;
+        font-size: 13px;
+        text-decoration: none;
+    }
+
+    .results-heading {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 18px;
+    }
+
+    .results-heading h2 {
+        font-size: 21px;
+        font-weight: 750;
+        color: #173b70;
+        margin: 0;
+    }
+
+    .result-count {
+        background: #dbeafe;
+        color: #1d4ed8;
+        padding: 7px 12px;
+        border-radius: 20px;
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    .facility-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 20px;
+    }
+
+    .facility-card {
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 15px;
+        padding: 22px;
+        box-shadow: 0 4px 15px rgba(15, 23, 42, 0.04);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .facility-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 10px 24px rgba(15, 23, 42, 0.09);
+    }
+
+    .facility-card h3 {
+        color: #173b70;
+        font-size: 18px;
+        font-weight: 750;
+        margin: 12px 0;
+    }
+
+    .facility-category {
+        display: inline-block;
+        background: #eff6ff;
+        color: #1d4ed8;
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 700;
+    }
+
+    .facility-info {
+        color: #64748b;
+        font-size: 13px;
+        line-height: 1.7;
+        margin-bottom: 9px;
+        overflow-wrap: anywhere;
+    }
+
+    .verified-label {
+        display: inline-block;
+        background: #dcfce7;
+        color: #166534;
+        padding: 5px 9px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 700;
+        margin-top: 5px;
+    }
+
+    .unverified-label {
+        display: inline-block;
+        background: #fef3c7;
+        color: #92400e;
+        padding: 5px 9px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 700;
+        margin-top: 5px;
+    }
+
+    .details-button {
+        display: inline-block;
+        margin-top: 15px;
+        background: #1674d1;
+        color: white;
+        padding: 10px 15px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    .details-button:hover {
+        background: #125ca8;
+        color: white;
+        text-decoration: none;
+    }
+
+    .empty-state {
+        background: white;
+        border: 1px dashed #cbd5e1;
+        border-radius: 15px;
+        padding: 45px 20px;
+        text-align: center;
+        grid-column: 1 / -1;
+    }
+
+    .empty-state .empty-icon {
+        font-size: 42px;
+        margin-bottom: 12px;
+    }
+
+    .empty-state h3 {
+        color: #173b70;
+        font-weight: 750;
+    }
+
+    .empty-state p {
+        color: #64748b;
+        margin-bottom: 0;
+    }
+
+    /* =========================================
+       DARK MODE
+    ========================================= */
+
+    html[data-theme="dark"] .directory-page {
+        color: #ffffff;
+    }
+
+    html[data-theme="dark"] .directory-header {
+        background: #171717;
+        border: 1px solid #303030;
+    }
+
+    html[data-theme="dark"] .back-link {
+        color: #b3b3b3;
+    }
+
+    html[data-theme="dark"] .filter-panel {
+        background: #171717;
+        border: 1px solid #303030;
+        box-shadow: none;
+    }
+
+    html[data-theme="dark"] .filter-panel h3 {
+        color: #ffffff;
+    }
+
+    html[data-theme="dark"] .filter-field label {
+        color: #b3b3b3;
+    }
+
+    html[data-theme="dark"] .filter-field input {
+        background: #262626;
+        color: #ffffff;
+        border: 1px solid #404040;
+    }
+
+    html[data-theme="dark"] .filter-field input::placeholder {
+        color: #a3a3a3;
+    }
+
+    html[data-theme="dark"] .filter-field input:focus {
+        border-color: #777777;
+        box-shadow: 0 0 0 3px rgba(255,255,255,0.06);
+    }
+
+    html[data-theme="dark"] .filter-button {
+        background: #404040;
+        color: #ffffff;
+    }
+
+    html[data-theme="dark"] .filter-button:hover {
+        background: #525252;
+    }
+
+    html[data-theme="dark"] .clear-button {
+        color: #b3b3b3;
+    }
+
+    html[data-theme="dark"] .results-heading h2 {
+        color: #ffffff;
+    }
+
+    html[data-theme="dark"] .result-count {
+        background: #262626;
+        color: #ffffff;
+        border: 1px solid #404040;
+    }
+
+    html[data-theme="dark"] .facility-card {
+        background: #171717;
+        border: 1px solid #303030;
+        box-shadow: none;
+    }
+
+    html[data-theme="dark"] .facility-card:hover {
+        background: #202020;
+        border-color: #505050;
+        box-shadow: 0 8px 22px rgba(0,0,0,0.3);
+    }
+
+    html[data-theme="dark"] .facility-card h3 {
+        color: #ffffff;
+    }
+
+    html[data-theme="dark"] .facility-category {
+        background: #262626;
+        color: #ffffff;
+        border: 1px solid #404040;
+    }
+
+    html[data-theme="dark"] .facility-info {
+        color: #b3b3b3;
+    }
+
+    html[data-theme="dark"] .facility-info strong {
+        color: #ffffff;
+    }
+
+    html[data-theme="dark"] .verified-label {
+        background: #183b2b;
+        color: #86efac;
+    }
+
+    html[data-theme="dark"] .unverified-label {
+        background: #3d3215;
+        color: #fcd34d;
+    }
+
+    html[data-theme="dark"] .details-button {
+        background: #404040;
+        color: #ffffff;
+    }
+
+    html[data-theme="dark"] .details-button:hover {
+        background: #525252;
+    }
+
+    html[data-theme="dark"] .empty-state {
+        background: #171717;
+        border: 1px dashed #404040;
+    }
+
+    html[data-theme="dark"] .empty-state h3 {
+        color: #ffffff;
+    }
+
+    html[data-theme="dark"] .empty-state p {
+        color: #b3b3b3;
+    }
+
+    /* RESPONSIVE DESIGN */
+
+    @media (max-width: 1000px) {
+        .filter-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .facility-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+    }
+
+    @media (max-width: 600px) {
+        .directory-header {
+            padding: 25px 20px;
+        }
+
+        .directory-header h1 {
+            font-size: 24px;
+        }
+
+        .filter-grid,
+        .facility-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .results-heading {
+            align-items: flex-start;
+            flex-direction: column;
+        }
+    }
+</style>
+{% endblock %}
+
+
+{% block content %}
+
+<div class="directory-page">
+
+    <a href="{{ url_for('emergency_services.emergency_services_home') }}"
+       class="back-link">
+        ← Back to Emergency Services
+    </a>
+
+    <!-- CATEGORY HEADER -->
+    <section class="directory-header">
+
+        <h1>{{ category }}</h1>
+
+        <p>
+            Search and explore {{ category|lower }} across India.
+            Filter the facilities by state, district or city.
+        </p>
+
+    </section>
+
+
+    <!-- FILTER PANEL -->
+    <section class="filter-panel">
+
+        <h3>Find Emergency Facilities</h3>
+
+        <form method="GET"
+              action="{{ url_for('emergency_services.category_list', category=category) }}">
+
+            <div class="filter-grid">
+
+                <div class="filter-field">
+                    <label for="search">Search facility</label>
+
+                    <input
+                        type="text"
+                        id="search"
+                        name="search"
+                        placeholder="Enter facility name or area"
+                        value="{{ search }}">
+                </div>
+
+                <div class="filter-field">
+                    <label for="state">State</label>
+
+                    <input
+                        type="text"
+                        id="state"
+                        name="state"
+                        placeholder="Enter state"
+                        value="{{ selected_state }}">
+                </div>
+
+                <div class="filter-field">
+                    <label for="district">District</label>
+
+                    <input
+                        type="text"
+                        id="district"
+                        name="district"
+                        placeholder="Enter district"
+                        value="{{ selected_district }}">
+                </div>
+
+                <div class="filter-field">
+                    <label for="city">City</label>
+
+                    <input
+                        type="text"
+                        id="city"
+                        name="city"
+                        placeholder="Enter city"
+                        value="{{ selected_city }}">
+                </div>
+
+                <button type="submit" class="filter-button">
+                    Search
+                </button>
+
+            </div>
+
+            <a href="{{ url_for('emergency_services.category_list', category=category) }}"
+               class="clear-button">
+                Clear all filters
+            </a>
+
+        </form>
+
+    </section>
+
+
+    <!-- RESULTS HEADING -->
+    <div class="results-heading">
+
+        <h2>Available Facilities</h2>
+
+        <span class="result-count">
+            {{ services|length }} Results
+        </span>
+
+    </div>
+
+
+    <!-- FACILITY CARDS -->
+    <div class="facility-grid">
+
+        {% for service in services %}
+
+        <article class="facility-card">
+
+            <span class="facility-category">
+                {{ service.category }}
+            </span>
+
+            <h3>{{ service.service_name }}</h3>
+
+            {% if service.subcategory %}
+            <div class="facility-info">
+                <strong>Type:</strong> {{ service.subcategory }}
+            </div>
+            {% endif %}
+
+            <div class="facility-info">
+                <strong>Location:</strong>
+                {{ service.city or "City not provided" }},
+                {{ service.district or "District not provided" }},
+                {{ service.state }}
+            </div>
+
+            <div class="facility-info">
+                <strong>Address:</strong>
+                {{ service.address }}
+            </div>
+
+            {% if service.phone %}
+            <div class="facility-info">
+                <strong>Phone:</strong>
+                {{ service.phone }}
+            </div>
+            {% endif %}
+
+            {% if service.is_verified %}
+            <span class="verified-label">✓ Verified</span>
+            {% else %}
+            <span class="unverified-label">Not yet verified</span>
+            {% endif %}
+
+            <div>
+                <a class="details-button"
+                   href="{{ url_for('emergency_services.service_details', service_id=service.service_id) }}">
+                    View Details →
+                </a>
+            </div>
+
+        </article>
+
+        {% else %}
+
+        <div class="empty-state">
+
+            <div class="empty-icon">🔎</div>
+
+            <h3>No Facilities Found</h3>
+
+            <p>
+                No facilities are currently available for this category
+                and selected filters. Try changing your search.
+            </p>
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+</div>
+
+{% endblock %}

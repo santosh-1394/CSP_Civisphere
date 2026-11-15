@@ -1,0 +1,493 @@
+
+{% extends "base.html" %}
+
+{% block title %}CiviSphere - Emergency Services Directory{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+
+<style>
+    .container {
+        width: 92%;
+        max-width: 1250px;
+        margin: auto;
+    }
+
+    /* HERO SECTION */
+    .hero {
+        background: linear-gradient(135deg, #0b3d91, #1677d2);
+        color: white;
+        padding: 65px 30px;
+        border-radius: 18px;
+        text-align: center;
+        margin: 25px 0;
+    }
+
+    .hero h1 {
+        font-size: 38px;
+        margin-bottom: 15px;
+    }
+
+    .hero p {
+        font-size: 17px;
+        margin-bottom: 18px;
+    }
+
+    /* SEARCH */
+    .search-box {
+        display: flex;
+        max-width: 700px;
+        margin: 25px auto 0;
+        background: white;
+        padding: 7px;
+        border-radius: 10px;
+        gap: 8px;
+    }
+
+    .search-box input {
+        flex: 1;
+        min-width: 0;
+        border: none;
+        outline: none;
+        padding: 13px;
+        font-size: 15px;
+        color: #183b63;
+        background: white;
+    }
+
+    .search-box button {
+        background: #0b3d91;
+        color: white;
+        border: none;
+        padding: 12px 22px;
+        border-radius: 7px;
+        cursor: pointer;
+        font-weight: 600;
+    }
+
+    .search-box button:hover {
+        background: #082f70;
+    }
+
+    .search-hint {
+        font-size: 13px !important;
+        color: #dbeafe;
+        margin-top: 12px;
+        margin-bottom: 0 !important;
+    }
+
+    /* SECTION HEADINGS */
+    .section-title {
+        text-align: center;
+        color: #123d70;
+        margin: 40px 0 10px;
+    }
+
+    .section-subtitle {
+        text-align: center;
+        color: #64748b;
+        margin-bottom: 25px;
+    }
+
+    /* SERVICE CARDS */
+    .service-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+        gap: 18px;
+        margin: 25px 0;
+    }
+
+    .service-card {
+        display: block;
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 13px;
+        padding: 24px;
+        text-align: center;
+        text-decoration: none;
+        color: #183b63;
+        box-shadow: 0 4px 14px rgba(0,0,0,0.04);
+        transition: 0.2s;
+    }
+
+    .service-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 22px rgba(0,0,0,0.09);
+    }
+
+    .service-icon {
+        font-size: 34px;
+        margin-bottom: 12px;
+    }
+
+    .service-card h3 {
+        margin-bottom: 8px;
+    }
+
+    .service-card p {
+        color: #64748b;
+        font-size: 14px;
+        line-height: 1.6;
+    }
+
+    /* MAP */
+    .map-container {
+        background: white;
+        padding: 15px;
+        border-radius: 14px;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+        margin: 25px 0 40px;
+    }
+
+    #homeMap {
+        height: 380px;
+        width: 100%;
+        border-radius: 10px;
+        z-index: 1;
+    }
+
+    /* CALL TO ACTION */
+    .cta {
+        text-align: center;
+        background: #eaf3ff;
+        padding: 35px 20px;
+        border-radius: 15px;
+        margin: 35px 0;
+    }
+
+    .cta p {
+        margin: 12px 0;
+    }
+
+    .cta a {
+        display: inline-block;
+        background: #0b55a0;
+        color: white;
+        text-decoration: none;
+        padding: 12px 25px;
+        border-radius: 8px;
+        margin: 8px;
+    }
+
+    .cta a:hover {
+        background: #083d78;
+    }
+
+    /* DARK MODE */
+    html[data-theme="dark"] .hero {
+        background: linear-gradient(135deg, #171717, #262626);
+    }
+
+    html[data-theme="dark"] .section-title {
+        color: #ffffff;
+    }
+
+    html[data-theme="dark"] .section-subtitle {
+        color: #b3b3b3;
+    }
+
+    html[data-theme="dark"] .service-card {
+        background: #171717;
+        border-color: #303030;
+        color: #ffffff;
+        box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+    }
+
+    html[data-theme="dark"] .service-card:hover {
+        background: #202020;
+        border-color: #505050;
+    }
+
+    html[data-theme="dark"] .service-card p {
+        color: #b3b3b3;
+    }
+
+    html[data-theme="dark"] .search-box {
+        background: #262626;
+        border: 1px solid #404040;
+    }
+
+    html[data-theme="dark"] .search-box input {
+        background: #262626;
+        color: #ffffff;
+    }
+
+    html[data-theme="dark"] .search-box input::placeholder {
+        color: #a3a3a3;
+    }
+
+    html[data-theme="dark"] .search-box button {
+        background: #404040;
+        color: #ffffff;
+    }
+
+    html[data-theme="dark"] .search-box button:hover {
+        background: #525252;
+    }
+
+    html[data-theme="dark"] .map-container {
+        background: #171717;
+        border: 1px solid #303030;
+    }
+
+    html[data-theme="dark"] .cta {
+        background: #171717;
+        border: 1px solid #303030;
+        color: #ffffff;
+    }
+
+    html[data-theme="dark"] .cta p {
+        color: #b3b3b3;
+    }
+
+    html[data-theme="dark"] .cta a {
+        background: #404040;
+        color: #ffffff;
+    }
+
+    html[data-theme="dark"] .cta a:hover {
+        background: #525252;
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 600px) {
+        .hero {
+            padding: 40px 15px;
+        }
+
+        .hero h1 {
+            font-size: 28px;
+        }
+
+        .search-box {
+            flex-direction: column;
+        }
+
+        .search-box button {
+            width: 100%;
+        }
+
+        #homeMap {
+            height: 300px;
+        }
+    }
+</style>
+{% endblock %}
+
+
+{% block content %}
+
+<div class="container">
+
+    <!-- HERO SECTION -->
+    <section class="hero">
+
+        <h1>Welcome to CiviSphere</h1>
+
+        <p>Your Community. Your Services. One Platform.</p>
+
+        <p>
+            Find emergency facilities and essential community support
+            services across different locations.
+        </p>
+
+        <!-- EMERGENCY SERVICES SEARCH -->
+        <form class="search-box"
+              action="{{ url_for('emergency_services.search_services') }}"
+              method="GET">
+
+            <input
+                type="text"
+                name="location"
+                required
+                placeholder="Search city, district or state..."
+                aria-label="Search emergency services by location"
+            >
+
+            <button type="submit">
+                Find Emergency Services
+            </button>
+
+        </form>
+
+        <p class="search-hint">
+            Search by city, district, state or area name.
+        </p>
+
+    </section>
+
+
+    <!-- EXPLORE SECTION -->
+    <h2 class="section-title">Explore CiviSphere</h2>
+
+    <p class="section-subtitle">
+        Access emergency facilities and important community features.
+    </p>
+
+    <div class="service-grid">
+
+        <!-- EMERGENCY SERVICES -->
+        <a class="service-card"
+           href="{{ url_for('emergency_services.emergency_services_home') }}">
+
+            <div class="service-icon">🚨</div>
+
+            <h3>Emergency Services Directory</h3>
+
+            <p>
+                Find hospitals, fire stations, police stations,
+                ambulance services, blood banks and more.
+            </p>
+
+        </a>
+
+
+        <!-- LOCATIONS -->
+        <a class="service-card"
+           href="{{ url_for('locations.location_list') }}">
+
+            <div class="service-icon">📍</div>
+
+            <h3>Community Locations</h3>
+
+            <p>
+                Discover registered community locations
+                and useful facilities.
+            </p>
+
+        </a>
+
+
+        <!-- COMPLAINTS -->
+        <a class="service-card"
+            href="{{ url_for('complaints.submit_complaint') }}">
+            <div class="service-icon">📝</div>
+
+            <h3>Complaint Management</h3>
+
+            <p>
+                Submit complaints and follow their
+                progress through the portal.
+            </p>
+
+        </a>
+
+
+        <!-- BLOOD DONORS -->
+        <a class="service-card"
+           href="{{ url_for('donors.donor_list') }}">
+
+            <div class="service-icon">🩸</div>
+
+            <h3>Blood Donor Directory</h3>
+
+            <p>
+                Find registered voluntary blood donors
+                based on blood group and location.
+            </p>
+
+        </a>
+
+
+        <!-- IMPORTANT CONTACTS -->
+        <a class="service-card"
+           href="{{ url_for('contacts.contact_list') }}">
+
+            <div class="service-icon">☎️</div>
+
+            <h3>Important Contacts</h3>
+
+            <p>
+                Access useful emergency and
+                community contact information.
+            </p>
+
+        </a>
+
+
+        <!-- COMMUNITY SUPPORT -->
+        <a class="service-card"
+            href="{{ url_for('citizen_dashboard') }}">
+            <div class="service-icon">🤝</div>
+
+            <h3>Community Support</h3>
+
+            <p>
+                Access notifications, feedback
+                and other community features.
+            </p>
+
+        </a>
+
+    </div>
+
+
+    <!-- MAP SECTION -->
+    <h2 class="section-title">Explore Locations on the Map</h2>
+
+    <p class="section-subtitle">
+        View the map and explore your community.
+    </p>
+
+    <div class="map-container">
+        <div id="homeMap"></div>
+    </div>
+
+
+    <!-- CALL TO ACTION -->
+    <section class="cta">
+
+        <h2>Become a Part of CiviSphere</h2>
+
+        <p>
+            Create an account to access community features
+            and manage your complaints.
+        </p>
+
+        <a href="{{ url_for('auth.register') }}">
+            Create Account
+        </a>
+
+        <a href="{{ url_for('auth.login') }}">
+            Login
+        </a>
+
+    </section>
+
+</div>
+
+{% endblock %}
+
+
+{% block extra_js %}
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const mapElement = document.getElementById("homeMap");
+
+        if (!mapElement || typeof L === "undefined") {
+            return;
+        }
+
+        const map = L.map("homeMap").setView([16.5, 80.6], 7);
+
+        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+            attribution: "&copy; OpenStreetMap contributors"
+        }).addTo(map);
+
+        L.marker([16.5, 80.6])
+            .addTo(map)
+            .bindPopup("Explore community locations with CiviSphere.");
+
+        setTimeout(function () {
+            map.invalidateSize();
+        }, 200);
+
+    });
+</script>
+
+{% endblock %}

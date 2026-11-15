@@ -1,0 +1,335 @@
+
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard | CiviSphere{% endblock %}
+
+{% block content %}
+
+<style>
+    .admin-container {
+        max-width: 1250px;
+        margin: 30px auto;
+        padding: 20px;
+        color: var(--text);
+    }
+
+    /* Welcome Header */
+    .admin-header {
+        background: linear-gradient(135deg, #1e40af, #2563eb);
+        color: white;
+        padding: 35px;
+        border-radius: 15px;
+        margin-bottom: 30px;
+        box-shadow: 0 5px 15px rgba(37, 99, 235, 0.15);
+    }
+
+    .admin-header h1,
+    .admin-header p {
+        color: white;
+    }
+
+    .admin-header h1 {
+        font-size: 30px;
+        margin-bottom: 10px;
+    }
+
+    .admin-header p {
+        margin-top: 7px;
+        color: #e0eaff;
+    }
+
+    /* Section Headings */
+    .section-title {
+        font-size: 23px;
+        margin: 30px 0 18px;
+        color: var(--text);
+    }
+
+    /* Dashboard Grid */
+    .dashboard-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+    }
+
+    /* Dashboard Cards */
+    .dashboard-card {
+        background: var(--surface);
+        color: var(--text);
+        padding: 23px;
+        border-radius: 12px;
+        border: 1px solid var(--border);
+        box-shadow: var(--shadow);
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .dashboard-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow);
+    }
+
+    .card-icon {
+        font-size: 30px;
+        margin-bottom: 12px;
+    }
+
+    .dashboard-card h3 {
+        font-size: 22px;
+        color: var(--text);
+        margin-bottom: 7px;
+    }
+
+    .dashboard-card p {
+        color: var(--muted);
+        line-height: 1.5;
+        margin-bottom: 12px;
+    }
+
+    .dashboard-card a {
+        display: inline-block;
+        margin-top: 8px;
+        color: #3b82f6;
+        font-weight: 600;
+        text-decoration: none;
+    }
+
+    .dashboard-card a:hover {
+        text-decoration: underline;
+    }
+
+    /* Management Action Button */
+    .manage-btn {
+        display: inline-block;
+        background: #2563eb;
+        color: white !important;
+        padding: 10px 15px;
+        border-radius: 7px;
+        margin-top: 8px;
+        text-decoration: none !important;
+        font-weight: 600;
+        transition: background 0.3s;
+    }
+
+    .manage-btn:hover {
+        background: #1d4ed8;
+    }
+
+    .coming-soon {
+        display: inline-block;
+        background: var(--background);
+        color: var(--muted);
+        padding: 6px 10px;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: bold;
+    }
+
+    /* Complaint Status */
+    .status-panel {
+        background: var(--surface);
+        color: var(--text);
+        padding: 22px;
+        border-radius: 12px;
+        border: 1px solid var(--border);
+        box-shadow: var(--shadow);
+    }
+
+    .status-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px;
+        border-bottom: 1px solid var(--border);
+        color: var(--text);
+    }
+
+    .status-row strong {
+        color: var(--text);
+    }
+
+    .status-row:last-child {
+        border-bottom: none;
+    }
+
+    .status-count {
+        background: rgba(37, 99, 235, 0.12);
+        color: #3b82f6;
+        padding: 6px 13px;
+        border-radius: 20px;
+        font-weight: bold;
+    }
+
+    /* Back Link */
+    .back-link {
+        display: inline-block;
+        margin-top: 30px;
+        color: #3b82f6;
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+    .back-link:hover {
+        text-decoration: underline;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 800px) {
+        .dashboard-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @media (max-width: 550px) {
+        .dashboard-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .admin-header {
+            padding: 25px 20px;
+        }
+
+        .admin-header h1 {
+            font-size: 24px;
+        }
+
+        .admin-container {
+            padding: 12px;
+        }
+    }
+</style>
+
+<div class="admin-container">
+
+    <!-- Welcome Header -->
+    <div class="admin-header">
+        <h1>Welcome to Admin Dashboard 👋</h1>
+        <p>CiviSphere Administration Panel</p>
+        <p>Manage users, services, locations, complaints and community activities.</p>
+    </div>
+
+    <!-- Platform Statistics -->
+    <h2 class="section-title">Platform Statistics</h2>
+
+    <div class="dashboard-grid">
+
+        <div class="dashboard-card">
+            <div class="card-icon">👥</div>
+            <h3>{{ statistics.users }}</h3>
+            <p>Total Users</p>
+        </div>
+
+        <div class="dashboard-card">
+            <div class="card-icon">🏛️</div>
+            <h3>{{ statistics.services }}</h3>
+            <p>Total Services</p>
+        </div>
+
+        <div class="dashboard-card">
+            <div class="card-icon">📍</div>
+            <h3>{{ statistics.locations }}</h3>
+            <p>Total Locations</p>
+        </div>
+
+        <div class="dashboard-card">
+            <div class="card-icon">📢</div>
+            <h3>{{ statistics.complaints }}</h3>
+            <p>Total Complaints</p>
+        </div>
+
+        <div class="dashboard-card">
+            <div class="card-icon">🩸</div>
+            <h3>{{ statistics.donors }}</h3>
+            <p>Blood Donors</p>
+        </div>
+
+        <div class="dashboard-card">
+            <div class="card-icon">⭐</div>
+            <h3>{{ statistics.feedback }}</h3>
+            <p>Total Feedback</p>
+        </div>
+
+    </div>
+
+    <!-- Complaint Status Overview -->
+    <h2 class="section-title">Complaint Status Overview</h2>
+
+    <div class="status-panel">
+
+        {% for item in complaint_status %}
+
+        <div class="status-row">
+            <strong>{{ item.status }}</strong>
+            <span class="status-count">{{ item.total }}</span>
+        </div>
+
+        {% else %}
+
+        <p>No complaints available.</p>
+
+        {% endfor %}
+
+    </div>
+
+    <!-- Management Sections -->
+    <h2 class="section-title">Management Sections</h2>
+
+    <div class="dashboard-grid">
+
+        <!-- User Management -->
+        <div class="dashboard-card">
+            <div class="card-icon">👥</div>
+            <h3>User Management</h3>
+            <p>View, search, activate and deactivate citizen accounts.</p>
+
+            <a href="{{ url_for('admin.user_management') }}"
+               class="manage-btn">
+                Manage Users →
+            </a>
+        </div>
+
+        <!-- Service Management -->
+        <div class="dashboard-card">
+            <div class="card-icon">🏛️</div>
+            <h3>Service Management</h3>
+            <p>Manage available citizen services.</p>
+
+            <a href="{{ url_for('services.list_services') }}"
+               class="manage-btn">
+                View Services →
+            </a>
+        </div>
+
+        <!-- Location Management -->
+        <div class="dashboard-card">
+            <div class="card-icon">📍</div>
+            <h3>Location Management</h3>
+            <p>Add, edit and deactivate service locations.</p>
+
+            <a href="{{ url_for('locations.admin_location_list') }}"
+               class="manage-btn">
+                Manage Locations →
+            </a>
+        </div>
+
+        <!-- Complaint Management -->
+        <div class="dashboard-card">
+            <div class="card-icon">📢</div>
+            <h3>Complaint Management</h3>
+            <p>Review and update citizen complaints.</p>
+
+            <a href="{{ url_for('complaints.admin_complaints') }}"
+               class="manage-btn">
+                Manage Complaints →
+            </a>
+        </div>
+
+    </div>
+
+    <!-- Back to Citizen Dashboard -->
+    <a href="{{ url_for('home') }}" class="back-link">
+        ← Back to Citizen Dashboard
+    </a>
+
+</div>
+
+{% endblock %}

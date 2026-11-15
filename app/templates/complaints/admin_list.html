@@ -1,0 +1,541 @@
+
+{% extends "base.html" %}
+
+{% block title %}Complaint Management | CiviSphere{% endblock %}
+
+{% block content %}
+
+<style>
+    /* =========================================
+       COMPLAINT MANAGEMENT - THEME VARIABLES
+    ========================================= */
+
+    .complaint-admin {
+        --cm-card: #ffffff;
+        --cm-surface: #f8fafc;
+        --cm-border: #e2e8f0;
+        --cm-heading: #1e293b;
+        --cm-text: #334155;
+        --cm-muted: #64748b;
+        --cm-input: #ffffff;
+        --cm-input-text: #1e293b;
+        --cm-shadow: rgba(0,0,0,0.04);
+
+        max-width: 1250px;
+        margin: 35px auto;
+        padding: 20px;
+        color: var(--cm-text);
+    }
+
+    /* Dark theme support */
+    html[data-theme="dark"] .complaint-admin,
+    body[data-theme="dark"] .complaint-admin,
+    html.dark-mode .complaint-admin,
+    body.dark-mode .complaint-admin,
+    html.dark .complaint-admin,
+    body.dark .complaint-admin,
+    .dark-mode .complaint-admin,
+    .dark-theme .complaint-admin {
+        --cm-card: #171717;
+        --cm-surface: #202020;
+        --cm-border: #303030;
+        --cm-heading: #ffffff;
+        --cm-text: #f5f5f5;
+        --cm-muted: #b3b3b3;
+        --cm-input: #262626;
+        --cm-input-text: #ffffff;
+        --cm-shadow: rgba(0,0,0,0.25);
+    }
+
+    /* Header */
+    .complaint-header {
+        background: linear-gradient(135deg, #1e3a8a, #2563eb);
+        color: white;
+        padding: 35px;
+        border-radius: 16px;
+        margin-bottom: 28px;
+        box-shadow: 0 8px 25px rgba(37, 99, 235, 0.15);
+    }
+
+    .complaint-header h1 {
+        font-size: 29px;
+        margin-bottom: 10px;
+        color: white;
+    }
+
+    .complaint-header p {
+        color: #dbeafe;
+        line-height: 1.6;
+    }
+
+    .header-label {
+        display: inline-block;
+        background: rgba(255,255,255,0.15);
+        padding: 7px 13px;
+        border-radius: 20px;
+        margin-bottom: 14px;
+        font-size: 13px;
+    }
+
+    /* Statistics */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 18px;
+        margin-bottom: 32px;
+    }
+
+    .stat-card {
+        background: var(--cm-card);
+        padding: 22px;
+        border-radius: 13px;
+        border: 1px solid var(--cm-border);
+        box-shadow: 0 3px 12px var(--cm-shadow);
+    }
+
+    .stat-icon {
+        font-size: 27px;
+        margin-bottom: 12px;
+    }
+
+    .stat-card h2 {
+        font-size: 27px;
+        color: #2563eb;
+        margin-bottom: 5px;
+    }
+
+    .stat-card p {
+        color: var(--cm-muted);
+        font-size: 14px;
+    }
+
+    /* Section */
+    .section-heading {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 18px;
+        gap: 10px;
+    }
+
+    .section-heading h2 {
+        font-size: 22px;
+        color: var(--cm-heading);
+    }
+
+    .complaint-count {
+        background: #eff6ff;
+        color: #1d4ed8;
+        padding: 7px 13px;
+        border-radius: 20px;
+        font-size: 13px;
+        font-weight: bold;
+    }
+
+    /* Complaint Card */
+    .complaint-card {
+        background: var(--cm-card);
+        border: 1px solid var(--cm-border);
+        border-radius: 14px;
+        padding: 24px;
+        margin-bottom: 22px;
+        box-shadow: 0 3px 12px var(--cm-shadow);
+        transition: 0.2s;
+    }
+
+    .complaint-card:hover {
+        box-shadow: 0 7px 20px var(--cm-shadow);
+        transform: translateY(-2px);
+    }
+
+    .complaint-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 15px;
+        flex-wrap: wrap;
+        padding-bottom: 18px;
+        border-bottom: 1px solid var(--cm-border);
+        margin-bottom: 18px;
+    }
+
+    .complaint-top h3 {
+        font-size: 20px;
+        color: var(--cm-heading);
+        margin-bottom: 8px;
+        text-transform: capitalize;
+    }
+
+    .tracking-id {
+        color: var(--cm-muted);
+        font-size: 13px;
+    }
+
+    /* Status Badges */
+    .status-badge {
+        padding: 7px 13px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: bold;
+        white-space: nowrap;
+    }
+
+    .status-pending {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    .status-progress {
+        background: #dbeafe;
+        color: #1e40af;
+    }
+
+    .status-resolved {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .complaint-info {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+        margin-bottom: 22px;
+    }
+
+    .info-item {
+        background: var(--cm-surface);
+        padding: 13px;
+        border: 1px solid var(--cm-border);
+        border-radius: 9px;
+        min-width: 0;
+    }
+
+    .info-item small {
+        display: block;
+        color: var(--cm-muted);
+        margin-bottom: 6px;
+        font-size: 12px;
+    }
+
+    .info-item strong {
+        color: var(--cm-text);
+        font-size: 14px;
+        overflow-wrap: anywhere;
+    }
+
+    /* Update Form */
+    .update-panel {
+        background: var(--cm-surface);
+        border: 1px solid var(--cm-border);
+        border-radius: 11px;
+        padding: 20px;
+    }
+
+    .update-panel h4 {
+        color: var(--cm-heading);
+        margin-bottom: 17px;
+        font-size: 16px;
+    }
+
+    .form-group {
+        margin-bottom: 16px;
+    }
+
+    .form-group label {
+        display: block;
+        color: var(--cm-text);
+        font-weight: 600;
+        font-size: 14px;
+        margin-bottom: 8px;
+    }
+
+    .form-group select,
+    .form-group textarea {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid var(--cm-border);
+        border-radius: 8px;
+        font-family: Arial, sans-serif;
+        font-size: 14px;
+        background: var(--cm-input);
+        color: var(--cm-input-text);
+        outline: none;
+        box-sizing: border-box;
+    }
+
+    .form-group select option {
+        background: var(--cm-input);
+        color: var(--cm-input-text);
+    }
+
+    .form-group select:focus,
+    .form-group textarea:focus {
+        border-color: #2563eb;
+        box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+    }
+
+    .form-group textarea {
+        resize: vertical;
+        min-height: 90px;
+    }
+
+    .form-group textarea::placeholder {
+        color: var(--cm-muted);
+        opacity: 1;
+    }
+
+    .update-btn {
+        background: #2563eb;
+        color: white;
+        border: none;
+        padding: 12px 22px;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+
+    .update-btn:hover {
+        background: #1d4ed8;
+    }
+
+    /* Empty State */
+    .empty-state {
+        background: var(--cm-card);
+        border: 1px dashed var(--cm-border);
+        padding: 55px 20px;
+        text-align: center;
+        border-radius: 14px;
+    }
+
+    .empty-state .empty-icon {
+        font-size: 45px;
+        margin-bottom: 15px;
+    }
+
+    .empty-state h3 {
+        color: var(--cm-heading);
+        margin-bottom: 8px;
+    }
+
+    .empty-state p {
+        color: var(--cm-muted);
+    }
+
+    .back-link {
+        display: inline-block;
+        margin-top: 20px;
+        color: #3b82f6;
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+    .back-link:hover {
+        text-decoration: underline;
+    }
+
+    /* Responsive */
+    @media(max-width: 850px) {
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @media(max-width: 550px) {
+        .complaint-admin {
+            padding: 12px;
+        }
+
+        .complaint-header {
+            padding: 24px 18px;
+        }
+
+        .complaint-header h1 {
+            font-size: 23px;
+        }
+
+        .stats-grid {
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .stat-card {
+            padding: 15px;
+        }
+
+        .complaint-card {
+            padding: 16px;
+        }
+
+        .complaint-info {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="complaint-admin">
+
+    <div class="complaint-header">
+        <span class="header-label">CiviSphere Administration</span>
+        <h1>📢 Complaint Management</h1>
+        <p>Monitor citizen complaints, review reported issues and manage resolution status.</p>
+    </div>
+
+    <!-- Statistics -->
+    <div class="stats-grid">
+
+        <div class="stat-card">
+            <div class="stat-icon">📋</div>
+            <h2>{{ complaints|length }}</h2>
+            <p>Complaints Listed</p>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon">🟡</div>
+            <h2>{{ complaints|selectattr('status', 'equalto', 'Pending')|list|length }}</h2>
+            <p>Pending</p>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon">🔵</div>
+            <h2>{{ complaints|selectattr('status', 'equalto', 'In Progress')|list|length }}</h2>
+            <p>In Progress</p>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon">🟢</div>
+            <h2>{{ complaints|selectattr('status', 'equalto', 'Resolved')|list|length }}</h2>
+            <p>Resolved</p>
+        </div>
+
+    </div>
+
+    <!-- Complaint List -->
+    <div class="section-heading">
+        <h2>All Citizen Complaints</h2>
+        <span class="complaint-count">
+            {{ complaints|length }} Records
+        </span>
+    </div>
+
+    {% if complaints %}
+
+        {% for complaint in complaints %}
+
+        <div class="complaint-card">
+
+            <div class="complaint-top">
+                <div>
+                    <h3>{{ complaint.subject }}</h3>
+                    <div class="tracking-id">
+                        Tracking ID: {{ complaint.tracking_id }}
+                    </div>
+                </div>
+
+                {% if complaint.status == 'Pending' %}
+                    <span class="status-badge status-pending">Pending</span>
+                {% elif complaint.status == 'In Progress' %}
+                    <span class="status-badge status-progress">In Progress</span>
+                {% elif complaint.status == 'Resolved' %}
+                    <span class="status-badge status-resolved">Resolved</span>
+                {% else %}
+                    <span class="status-badge">{{ complaint.status }}</span>
+                {% endif %}
+            </div>
+
+            <!-- Citizen Information -->
+            <div class="complaint-info">
+
+                <div class="info-item">
+                    <small>👤 Citizen Name</small>
+                    <strong>{{ complaint.full_name }}</strong>
+                </div>
+
+                <div class="info-item">
+                    <small>✉️ Email Address</small>
+                    <strong>{{ complaint.email }}</strong>
+                </div>
+
+                <div class="info-item">
+                    <small>📍 Complaint Location</small>
+                    <strong>{{ complaint.location or 'Not provided' }}</strong>
+                </div>
+
+                <div class="info-item">
+                    <small>🕒 Submitted On</small>
+                    <strong>{{ complaint.created_at }}</strong>
+                </div>
+
+            </div>
+
+            <!-- Update Status -->
+            <div class="update-panel">
+
+                <h4>Update Complaint Status</h4>
+
+                <form method="POST"
+                      action="{{ url_for('complaints.update_complaint_status', complaint_id=complaint.complaint_id) }}">
+
+                    <input type="hidden"
+                           name="csrf_token"
+                           value="{{ csrf_token() }}">
+
+                    <div class="form-group">
+                        <label>Status</label>
+
+                        <select name="status" required>
+                            <option value="Pending"
+                                {% if complaint.status == 'Pending' %}selected{% endif %}>
+                                Pending
+                            </option>
+
+                            <option value="In Progress"
+                                {% if complaint.status == 'In Progress' %}selected{% endif %}>
+                                In Progress
+                            </option>
+
+                            <option value="Resolved"
+                                {% if complaint.status == 'Resolved' %}selected{% endif %}>
+                                Resolved
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Admin Remarks</label>
+
+                        <textarea
+                            name="remarks"
+                            rows="3"
+                            placeholder="Enter remarks or provide an update to the citizen..."
+                        ></textarea>
+                    </div>
+
+                    <button type="submit" class="update-btn">
+                        Update Complaint →
+                    </button>
+
+                </form>
+            </div>
+
+        </div>
+
+        {% endfor %}
+
+    {% else %}
+
+        <div class="empty-state">
+            <div class="empty-icon">📭</div>
+            <h3>No Complaints Found</h3>
+            <p>There are currently no citizen complaints to manage.</p>
+        </div>
+
+    {% endif %}
+
+    <a href="{{ url_for('admin.admin_dashboard') }}" class="back-link">
+        ← Back to Admin Dashboard
+    </a>
+
+</div>
+
+{% endblock %}

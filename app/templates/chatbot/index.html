@@ -1,0 +1,235 @@
+
+{% extends "base.html" %}
+
+{% block content %}
+<div class="page-container">
+    <div class="page-header">
+        <div>
+            <h1>CiviSphere Assistant</h1>
+            <p>Your virtual assistant for citizen services and community support.</p>
+        </div>
+    </div>
+
+    <div class="chat-container">
+        <div class="chat-header">
+            <div>
+                <h2>💬 CiviSphere Chatbot</h2>
+                <small>Ask me about our services</small>
+            </div>
+            <span class="chat-status">● Online</span>
+        </div>
+
+        <div class="chat-messages" id="chatMessages">
+            <div class="bot-message">
+                Hello! Welcome to CiviSphere. 👋
+                <br><br>
+                How can I help you today?
+            </div>
+        </div>
+
+        <div class="suggested-questions">
+            <button type="button" onclick="sendSuggested('How can I submit a complaint?')">
+                Submit Complaint
+            </button>
+            <button type="button" onclick="sendSuggested('How can I find blood donors?')">
+                Blood Donors
+            </button>
+            <button type="button" onclick="sendSuggested('What services are available?')">
+                Citizen Services
+            </button>
+        </div>
+
+        <form id="chatForm" class="chat-input-area">
+            <input
+                type="hidden"
+                id="csrfToken"
+                value="{{ csrf_token() }}"
+            >
+
+            <input
+                type="text"
+                id="userQuestion"
+                placeholder="Type your question here..."
+                maxlength="1000"
+                required
+            >
+
+            <button type="submit" id="sendButton">Send ➤</button>
+        </form>
+    </div>
+</div>
+
+<style>
+.chat-container {
+    max-width: 850px;
+    margin: 25px auto;
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    overflow: hidden;
+}
+
+.chat-header {
+    background: #1769aa;
+    color: white;
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.chat-header h2 {
+    margin: 0 0 5px;
+}
+
+.chat-status {
+    color: #c8ffd8;
+    font-size: 13px;
+}
+
+.chat-messages {
+    height: 400px;
+    overflow-y: auto;
+    padding: 20px;
+    background: #f5f8fc;
+}
+
+.bot-message, .user-message {
+    max-width: 75%;
+    padding: 13px 16px;
+    margin-bottom: 15px;
+    border-radius: 12px;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+.bot-message {
+    background: white;
+    border: 1px solid #e3e8ef;
+    margin-right: auto;
+}
+
+.user-message {
+    background: #1769aa;
+    color: white;
+    margin-left: auto;
+}
+
+.suggested-questions {
+    display: flex;
+    gap: 10px;
+    padding: 12px 15px;
+    flex-wrap: wrap;
+}
+
+.suggested-questions button {
+    border: 1px solid #1769aa;
+    color: #1769aa;
+    background: white;
+    padding: 8px 12px;
+    border-radius: 20px;
+    cursor: pointer;
+}
+
+.chat-input-area {
+    display: flex;
+    gap: 10px;
+    padding: 15px;
+    border-top: 1px solid #eee;
+}
+
+.chat-input-area input[type="text"] {
+    flex: 1;
+    min-width: 0;
+    padding: 13px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+}
+
+.chat-input-area button {
+    background: #1769aa;
+    color: white;
+    border: none;
+    padding: 12px 22px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.chat-input-area button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+@media (max-width: 600px) {
+    .chat-messages {
+        height: 350px;
+    }
+
+    .bot-message, .user-message {
+        max-width: 90%;
+    }
+}
+</style>
+
+<script>
+const chatForm = document.getElementById("chatForm");
+const questionInput = document.getElementById("userQuestion");
+const messages = document.getElementById("chatMessages");
+const sendButton = document.getElementById("sendButton");
+
+function addMessage(text, type) {
+    const message = document.createElement("div");
+    message.className = type === "user" ? "user-message" : "bot-message";
+    message.textContent = text;
+    messages.appendChild(message);
+    messages.scrollTop = messages.scrollHeight;
+}
+
+async function sendQuestion(question) {
+    question = question.trim();
+
+    if (!question || sendButton.disabled) return;
+
+    addMessage(question, "user");
+    questionInput.value = "";
+    sendButton.disabled = true;
+    sendButton.textContent = "Sending...";
+
+    try {
+        const response = await fetch("{{ url_for('chatbot.chatbot_ask') }}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": document.getElementById("csrfToken").value
+            },
+            body: JSON.stringify({ question: question })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.answer || "Unable to process your question.");
+        }
+
+        addMessage(data.answer, "bot");
+
+    } catch (error) {
+        addMessage(error.message || "Something went wrong. Please try again.", "bot");
+    } finally {
+        sendButton.disabled = false;
+        sendButton.textContent = "Send ➤";
+        questionInput.focus();
+    }
+}
+
+chatForm.addEventListener("submit", function(event) {
+    event.preventDefault();
+    sendQuestion(questionInput.value);
+});
+
+function sendSuggested(question) {
+    sendQuestion(question);
+}
+</script>
+{% endblock %}

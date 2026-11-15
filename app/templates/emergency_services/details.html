@@ -1,0 +1,725 @@
+
+{% extends "base.html" %}
+
+{% block title %}{{ service.service_name }} | CiviSphere{% endblock %}
+
+{% block extra_css %}
+
+<link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+/>
+
+<style>
+
+    .details-page {
+        padding: 30px 0 50px;
+    }
+
+    .back-link {
+        display: inline-block;
+        color: #1674d1;
+        text-decoration: none;
+        font-weight: 700;
+        margin-bottom: 20px;
+    }
+
+    /* FACILITY HEADER */
+
+    .facility-hero {
+        background: linear-gradient(135deg, #123b78, #1674d1);
+        color: white;
+        padding: 35px;
+        border-radius: 20px;
+        margin-bottom: 25px;
+    }
+
+    .facility-hero h1 {
+        font-size: 30px;
+        font-weight: 800;
+        margin: 12px 0;
+    }
+
+    .facility-hero p {
+        color: #eaf3ff;
+        margin-bottom: 0;
+    }
+
+    .category-label {
+        display: inline-block;
+        background: rgba(255,255,255,0.18);
+        color: white;
+        padding: 7px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    /* DETAILS GRID */
+
+    .details-grid {
+        display: grid;
+        grid-template-columns: 1.2fr 0.8fr;
+        gap: 22px;
+    }
+
+    .details-card {
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 16px;
+        padding: 25px;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 15px rgba(15,23,42,0.04);
+    }
+
+    .details-card h2 {
+        color: #173b70;
+        font-size: 20px;
+        font-weight: 750;
+        margin-bottom: 20px;
+    }
+
+    .info-row {
+        padding: 13px 0;
+        border-bottom: 1px solid #f1f5f9;
+    }
+
+    .info-row:last-child {
+        border-bottom: none;
+    }
+
+    .info-label {
+        display: block;
+        color: #64748b;
+        font-size: 12px;
+        font-weight: 700;
+        margin-bottom: 5px;
+        text-transform: uppercase;
+    }
+
+    .info-value {
+        color: #1e293b;
+        font-size: 15px;
+        overflow-wrap: anywhere;
+    }
+
+    /* VERIFICATION */
+
+    .verified {
+        display: inline-block;
+        background: #dcfce7;
+        color: #166534;
+        padding: 7px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .not-verified {
+        display: inline-block;
+        background: #fef3c7;
+        color: #92400e;
+        padding: 7px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    /* ACTION BUTTONS */
+
+    .action-button {
+        display: inline-block;
+        padding: 11px 15px;
+        border-radius: 9px;
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: 700;
+        margin: 5px 5px 5px 0;
+        border: none;
+        cursor: pointer;
+    }
+
+    .call-button {
+        background: #16a34a;
+        color: white;
+    }
+
+    .call-button:hover {
+        background: #15803d;
+        color: white;
+        text-decoration: none;
+    }
+
+    .map-button {
+        background: #1674d1;
+        color: white;
+    }
+
+    .map-button:hover {
+        background: #125ca8;
+        color: white;
+        text-decoration: none;
+    }
+
+    /* MAP */
+
+    .map-unavailable {
+        padding: 25px;
+        background: #f8fafc;
+        border-radius: 12px;
+        color: #64748b;
+        text-align: center;
+    }
+
+    #facilityMap {
+        width: 100%;
+        height: 350px;
+        border-radius: 12px;
+        z-index: 1;
+    }
+
+    .source-note {
+        color: #64748b;
+        font-size: 13px;
+        overflow-wrap: anywhere;
+    }
+
+    /* =========================================
+       DARK MODE
+    ========================================= */
+
+    html[data-theme="dark"] .details-page {
+        color: #ffffff;
+    }
+
+    html[data-theme="dark"] .back-link {
+        color: #b3b3b3;
+    }
+
+    html[data-theme="dark"] .facility-hero {
+        background: #171717;
+        border: 1px solid #303030;
+    }
+
+    html[data-theme="dark"] .category-label {
+        background: #303030;
+        color: #ffffff;
+    }
+
+    html[data-theme="dark"] .facility-hero h1 {
+        color: #ffffff;
+    }
+
+    html[data-theme="dark"] .facility-hero p {
+        color: #b3b3b3;
+    }
+
+    html[data-theme="dark"] .details-card {
+        background: #171717;
+        border: 1px solid #303030;
+        box-shadow: none;
+    }
+
+    html[data-theme="dark"] .details-card h2 {
+        color: #ffffff;
+    }
+
+    html[data-theme="dark"] .info-row {
+        border-bottom: 1px solid #303030;
+    }
+
+    html[data-theme="dark"] .info-label {
+        color: #b3b3b3;
+    }
+
+    html[data-theme="dark"] .info-value {
+        color: #ffffff;
+    }
+
+    html[data-theme="dark"] .verified {
+        background: #183b2b;
+        color: #86efac;
+    }
+
+    html[data-theme="dark"] .not-verified {
+        background: #3d3215;
+        color: #fcd34d;
+    }
+
+    html[data-theme="dark"] .source-note {
+        color: #b3b3b3;
+    }
+
+    html[data-theme="dark"] .map-unavailable {
+        background: #262626;
+        color: #b3b3b3;
+        border: 1px solid #303030;
+    }
+
+    html[data-theme="dark"] .map-button {
+        background: #404040;
+        color: #ffffff;
+    }
+
+    html[data-theme="dark"] .map-button:hover {
+        background: #525252;
+        color: #ffffff;
+    }
+
+    html[data-theme="dark"] .call-button {
+        background: #166534;
+        color: #ffffff;
+    }
+
+    html[data-theme="dark"] .call-button:hover {
+        background: #15803d;
+        color: #ffffff;
+    }
+
+    /* DARK MAP TILES */
+
+    html[data-theme="dark"] #facilityMap .leaflet-tile {
+        filter: invert(100%) hue-rotate(180deg) brightness(90%) contrast(85%);
+    }
+
+    html[data-theme="dark"] #facilityMap {
+        border: 1px solid #404040;
+    }
+
+    /* RESPONSIVE DESIGN */
+
+    @media (max-width: 800px) {
+
+        .details-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .facility-hero {
+            padding: 25px 20px;
+        }
+
+        .facility-hero h1 {
+            font-size: 24px;
+        }
+
+    }
+
+</style>
+
+{% endblock %}
+
+
+{% block content %}
+
+<div class="details-page">
+
+    <!-- BACK LINK -->
+
+    <a href="{{ url_for('emergency_services.category_list', category=service.category) }}"
+       class="back-link">
+
+        ← Back to {{ service.category }}
+
+    </a>
+
+
+    <!-- FACILITY HEADER -->
+
+    <section class="facility-hero">
+
+        <span class="category-label">
+            {{ service.category }}
+        </span>
+
+        <h1>{{ service.service_name }}</h1>
+
+        <p>
+            {{ service.city or "City not provided" }},
+            {{ service.district or "District not provided" }},
+            {{ service.state }}
+        </p>
+
+    </section>
+
+
+    <!-- DETAILS GRID -->
+
+    <div class="details-grid">
+
+        <!-- LEFT COLUMN -->
+
+        <div>
+
+            <!-- FACILITY INFORMATION -->
+
+            <section class="details-card">
+
+                <h2>Facility Information</h2>
+
+                {% if service.subcategory %}
+
+                <div class="info-row">
+
+                    <span class="info-label">
+                        Facility Type
+                    </span>
+
+                    <div class="info-value">
+                        {{ service.subcategory }}
+                    </div>
+
+                </div>
+
+                {% endif %}
+
+
+                <div class="info-row">
+
+                    <span class="info-label">
+                        Category
+                    </span>
+
+                    <div class="info-value">
+                        {{ service.category }}
+                    </div>
+
+                </div>
+
+
+                <div class="info-row">
+
+                    <span class="info-label">
+                        State
+                    </span>
+
+                    <div class="info-value">
+                        {{ service.state }}
+                    </div>
+
+                </div>
+
+
+                <div class="info-row">
+
+                    <span class="info-label">
+                        District
+                    </span>
+
+                    <div class="info-value">
+                        {{ service.district or "Not provided" }}
+                    </div>
+
+                </div>
+
+
+                <div class="info-row">
+
+                    <span class="info-label">
+                        City
+                    </span>
+
+                    <div class="info-value">
+                        {{ service.city or "Not provided" }}
+                    </div>
+
+                </div>
+
+
+                <div class="info-row">
+
+                    <span class="info-label">
+                        Full Address
+                    </span>
+
+                    <div class="info-value">
+                        {{ service.address }}
+                    </div>
+
+                </div>
+
+
+                {% if service.description %}
+
+                <div class="info-row">
+
+                    <span class="info-label">
+                        Description
+                    </span>
+
+                    <div class="info-value">
+                        {{ service.description }}
+                    </div>
+
+                </div>
+
+                {% endif %}
+
+
+                {% if service.operating_hours %}
+
+                <div class="info-row">
+
+                    <span class="info-label">
+                        Operating Hours
+                    </span>
+
+                    <div class="info-value">
+                        {{ service.operating_hours }}
+                    </div>
+
+                </div>
+
+                {% endif %}
+
+            </section>
+
+
+            <!-- LOCATION MAP -->
+
+            <section class="details-card">
+
+                <h2>Location Map</h2>
+
+                {% if service.latitude is not none and service.longitude is not none %}
+
+                <div
+                    id="facilityMap"
+                    data-latitude="{{ service.latitude }}"
+                    data-longitude="{{ service.longitude }}"
+                    data-name="{{ service.service_name }}">
+                </div>
+
+                <div style="margin-top: 15px;">
+
+                    <a
+                        class="action-button map-button"
+                        href="https://www.google.com/maps/dir/?api=1&destination={{ service.latitude }},{{ service.longitude }}"
+                        target="_blank"
+                        rel="noopener noreferrer">
+
+                        Get Directions
+
+                    </a>
+
+                </div>
+
+                {% else %}
+
+                <div class="map-unavailable">
+
+                    <div style="font-size: 32px;">📍</div>
+
+                    <p>
+                        Map coordinates are not available for this facility yet.
+                    </p>
+
+                </div>
+
+                {% endif %}
+
+            </section>
+
+        </div>
+
+
+        <!-- RIGHT COLUMN -->
+
+        <div>
+
+            <!-- CONTACT INFORMATION -->
+
+            <section class="details-card">
+
+                <h2>Contact Information</h2>
+
+                {% if service.phone %}
+
+                <div class="info-row">
+
+                    <span class="info-label">
+                        Primary Phone
+                    </span>
+
+                    <div class="info-value">
+                        {{ service.phone }}
+                    </div>
+
+                    <a class="action-button call-button"
+                       href="tel:{{ service.phone }}">
+
+                        📞 Call Now
+
+                    </a>
+
+                </div>
+
+                {% else %}
+
+                <div class="info-row">
+
+                    <span class="info-label">
+                        Primary Phone
+                    </span>
+
+                    <div class="info-value">
+                        Not provided
+                    </div>
+
+                </div>
+
+                {% endif %}
+
+
+                {% if service.alternate_phone %}
+
+                <div class="info-row">
+
+                    <span class="info-label">
+                        Alternate Phone
+                    </span>
+
+                    <div class="info-value">
+                        {{ service.alternate_phone }}
+                    </div>
+
+                    <a class="action-button call-button"
+                       href="tel:{{ service.alternate_phone }}">
+
+                        📞 Call Alternate Number
+
+                    </a>
+
+                </div>
+
+                {% endif %}
+
+            </section>
+
+
+            <!-- VERIFICATION STATUS -->
+
+            <section class="details-card">
+
+                <h2>Verification Status</h2>
+
+                {% if service.is_verified %}
+
+                <span class="verified">
+                    ✓ Verified Facility
+                </span>
+
+                <p class="source-note" style="margin-top: 12px;">
+
+                    This listing has been marked as verified by the platform.
+
+                </p>
+
+                {% else %}
+
+                <span class="not-verified">
+                    ⚠ Not Yet Verified
+                </span>
+
+                <p class="source-note" style="margin-top: 12px;">
+
+                    Please confirm the facility details before relying on them.
+
+                </p>
+
+                {% endif %}
+
+
+                {% if service.source %}
+
+                <div class="info-row" style="margin-top: 15px;">
+
+                    <span class="info-label">
+                        Information Source
+                    </span>
+
+                    <div class="source-note">
+                        {{ service.source }}
+                    </div>
+
+                </div>
+
+                {% endif %}
+
+            </section>
+
+
+            <!-- EMERGENCY REMINDER -->
+
+            <section class="details-card">
+
+                <h2>Emergency Reminder</h2>
+
+                <p class="info-value">
+                    For immediate emergency assistance in India, call:
+                </p>
+
+                <h2 style="font-size: 30px; color: #dc2626; margin: 10px 0;">
+                    112
+                </h2>
+
+                <a class="action-button call-button" href="tel:112">
+                    📞 Call 112
+                </a>
+
+            </section>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+
+{% block extra_js %}
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const mapElement = document.getElementById("facilityMap");
+
+    if (!mapElement || typeof L === "undefined") {
+        return;
+    }
+
+    const latitude = Number(mapElement.dataset.latitude);
+    const longitude = Number(mapElement.dataset.longitude);
+    const facilityName = mapElement.dataset.name || "Emergency Facility";
+
+    if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) {
+        return;
+    }
+
+    const map = L.map("facilityMap").setView(
+        [latitude, longitude],
+        15
+    );
+
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+        maxZoom: 19
+    }).addTo(map);
+
+    L.marker([latitude, longitude])
+        .addTo(map)
+        .bindPopup(facilityName)
+        .openPopup();
+
+    setTimeout(function () {
+        map.invalidateSize();
+    }, 200);
+
+});
+
+</script>
+
+{% endblock %}

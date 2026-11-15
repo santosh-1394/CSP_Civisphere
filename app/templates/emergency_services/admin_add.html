@@ -1,0 +1,266 @@
+
+{% extends "base.html" %}
+
+{% block title %}Add Emergency Facility - CiviSphere{% endblock %}
+
+{% block content %}
+
+<style>
+.facility-page {
+    max-width: 1000px;
+    margin: 45px auto;
+    padding: 20px;
+}
+
+.facility-card {
+    background: white;
+    padding: 35px;
+    border-radius: 16px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+}
+
+.facility-heading {
+    margin-bottom: 28px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #e5eaf2;
+}
+
+.facility-heading h2 {
+    color: #123d75;
+    font-size: 27px;
+    margin: 0 0 8px;
+}
+
+.facility-heading p {
+    color: #64748b;
+    margin: 0;
+}
+
+.form-section-title {
+    color: #174b87;
+    font-size: 17px;
+    font-weight: 700;
+    margin: 25px 0 15px;
+}
+
+.facility-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-group.full-width {
+    grid-column: 1 / -1;
+}
+
+.form-group label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #334155;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 12px 14px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    background: #f8fafc;
+    color: #1e293b;
+    font-size: 14px;
+    outline: none;
+    transition: 0.2s;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    border-color: #2563eb;
+    background: white;
+    box-shadow: 0 0 0 3px rgba(37,99,235,0.12);
+}
+
+.form-group textarea {
+    resize: vertical;
+}
+
+.form-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 30px;
+    padding-top: 22px;
+    border-top: 1px solid #e5eaf2;
+}
+
+.save-btn {
+    background: #1555a5;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 24px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.save-btn:hover {
+    background: #0d3d7b;
+}
+
+.cancel-btn {
+    background: #e9eef5;
+    color: #334155;
+    text-decoration: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+}
+
+@media(max-width: 650px) {
+    .facility-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .facility-card {
+        padding: 22px;
+    }
+
+    .form-group.full-width {
+        grid-column: auto;
+    }
+}
+</style>
+
+<div class="facility-page">
+
+    <div class="facility-card">
+
+        <div class="facility-heading">
+            <h2>➕ Add Emergency Facility</h2>
+            <p>Add verified emergency service information to the CiviSphere directory.</p>
+        </div>
+
+        <form method="POST">
+
+            <input type="hidden" name="csrf_token"
+                   value="{{ csrf_token() }}">
+
+            <h3 class="form-section-title">Facility Information</h3>
+
+            <div class="facility-grid">
+
+                <div class="form-group">
+                    <label>Category *</label>
+                    <select name="category" required>
+                        <option value="">Select category</option>
+                        {% for category in categories %}
+                        <option value="{{ category }}">{{ category }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Subcategory</label>
+                    <input type="text" name="subcategory"
+                           placeholder="Example: Government Hospital">
+                </div>
+
+                <div class="form-group full-width">
+                    <label>Facility Name *</label>
+                    <input type="text" name="service_name"
+                           placeholder="Enter facility name" required>
+                </div>
+
+                <div class="form-group">
+                    <label>State *</label>
+                    <input type="text" name="state"
+                           placeholder="Enter state" required>
+                </div>
+
+                <div class="form-group">
+                    <label>District</label>
+                    <input type="text" name="district"
+                           placeholder="Enter district">
+                </div>
+
+                <div class="form-group">
+                    <label>City</label>
+                    <input type="text" name="city"
+                           placeholder="Enter city">
+                </div>
+
+                <div class="form-group">
+                    <label>Operating Hours</label>
+                    <input type="text" name="operating_hours"
+                           placeholder="Example: Open 24 hours">
+                </div>
+
+                <div class="form-group full-width">
+                    <label>Full Address *</label>
+                    <textarea name="address" rows="3"
+                              placeholder="Enter complete facility address"
+                              required></textarea>
+                </div>
+
+            </div>
+
+            <h3 class="form-section-title">Contact Information</h3>
+
+            <div class="facility-grid">
+
+                <div class="form-group">
+                    <label>Phone Number</label>
+                    <input type="text" name="phone"
+                           placeholder="Enter contact number">
+                </div>
+
+                <div class="form-group">
+                    <label>Alternate Phone</label>
+                    <input type="text" name="alternate_phone"
+                           placeholder="Enter alternate number">
+                </div>
+
+            </div>
+
+            <h3 class="form-section-title">Additional Information</h3>
+
+            <div class="facility-grid">
+
+                <div class="form-group full-width">
+                    <label>Description</label>
+                    <textarea name="description" rows="3"
+                              placeholder="Enter facility details"></textarea>
+                </div>
+
+                <div class="form-group full-width">
+                    <label>Source / Reference</label>
+                    <input type="text" name="source"
+                           placeholder="Official website or verified reference">
+                </div>
+
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="save-btn">
+                    Save Facility
+                </button>
+
+                <a href="{{ url_for('emergency_services.admin_list') }}"
+                   class="cancel-btn">
+                    Cancel
+                </a>
+            </div>
+
+        </form>
+
+    </div>
+</div>
+
+{% endblock %}

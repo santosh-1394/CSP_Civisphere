@@ -1,0 +1,71 @@
+
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container" style="max-width:1000px; margin:40px auto;">
+
+    <h1>My Complaints</h1>
+    <p>View and track the complaints you have submitted.</p>
+
+    <a href="{{ url_for('complaints.submit_complaint') }}">
+        + Submit New Complaint
+    </a>
+
+    <hr style="margin:25px 0;">
+
+    {% if complaints %}
+
+        <div style="overflow-x:auto;">
+            <table style="width:100%; border-collapse:collapse;">
+
+                <thead>
+                    <tr>
+                        <th style="padding:12px; text-align:left;">Tracking ID</th>
+                        <th style="padding:12px; text-align:left;">Subject</th>
+                        <th style="padding:12px; text-align:left;">Location</th>
+                        <th style="padding:12px; text-align:left;">Status</th>
+                        <th style="padding:12px; text-align:left;">Submitted On</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for complaint in complaints %}
+                    <tr style="border-top:1px solid #ddd;">
+
+                        <td style="padding:12px;">
+                            {{ complaint.tracking_id }}
+                        </td>
+
+                        <td style="padding:12px;">
+                            {{ complaint.subject }}
+                        </td>
+
+                        <td style="padding:12px;">
+                            {{ complaint.location or 'Not provided' }}
+                        </td>
+
+                        <td style="padding:12px;">
+                            <strong>{{ complaint.status }}</strong>
+                        </td>
+
+                        <td style="padding:12px;">
+                            {{ complaint.created_at }}
+                        </td>
+
+                    </tr>
+                    {% endfor %}
+                </tbody>
+
+            </table>
+        </div>
+
+    {% else %}
+
+        <p>You haven't submitted any complaints yet.</p>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

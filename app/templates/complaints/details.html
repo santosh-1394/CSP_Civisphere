@@ -1,0 +1,85 @@
+
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container" style="max-width:800px; margin:40px auto;">
+
+    <h1>Complaint Details</h1>
+
+    <p><strong>Tracking ID:</strong> {{ complaint.tracking_id }}</p>
+    <p><strong>Subject:</strong> {{ complaint.subject }}</p>
+    <p><strong>Description:</strong> {{ complaint.description }}</p>
+    <p><strong>Location:</strong> {{ complaint.location or 'Not provided' }}</p>
+    <p><strong>Current Status:</strong> {{ complaint.status }}</p>
+    <p><strong>Submitted On:</strong> {{ complaint.created_at }}</p>
+
+    <hr>
+
+    <h2>Attachments</h2>
+
+    {% if attachments %}
+
+        {% for attachment in attachments %}
+
+            <div style="padding:12px; border-bottom:1px solid #ddd;">
+
+                <strong>{{ attachment.original_filename }}</strong>
+
+                <a
+                    href="{{ url_for(
+                        'complaints.download_attachment',
+                        attachment_id=attachment.attachment_id
+                    ) }}"
+                    style="margin-left:12px;"
+                >
+                    Download
+                </a>
+
+            </div>
+
+        {% endfor %}
+
+    {% else %}
+
+        <p>No attachments uploaded.</p>
+
+    {% endif %}
+
+    <hr>
+
+    <h2>Status History</h2>
+
+    {% if history %}
+
+        {% for item in history %}
+
+            <div style="padding:15px; border-bottom:1px solid #ddd;">
+
+                <strong>{{ item.new_status }}</strong>
+
+                <p>{{ item.remarks or 'No remarks provided' }}</p>
+
+                <small>{{ item.changed_at }}</small>
+
+            </div>
+
+        {% endfor %}
+
+    {% else %}
+
+        <p>No status history available.</p>
+
+    {% endif %}
+
+    <p style="margin-top:25px;">
+
+        <a href="{{ url_for('complaints.my_complaints') }}">
+            Back to My Complaints
+        </a>
+
+    </p>
+
+</div>
+
+{% endblock %}

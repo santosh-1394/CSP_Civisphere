@@ -1,0 +1,100 @@
+
+{% extends "base.html" %}
+
+{% block title %}Edit Emergency Facility - CiviSphere{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 850px; margin: 40px auto;">
+
+    <h2>Edit Emergency Facility</h2>
+    <p>Update the facility information below.</p>
+
+    <form method="POST">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+        <div class="form-group">
+            <label>Category *</label>
+            <select name="category" required>
+                {% for category in categories %}
+                <option value="{{ category }}"
+                    {% if service.category == category %}selected{% endif %}>
+                    {{ category }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Subcategory</label>
+            <input type="text" name="subcategory"
+                   value="{{ service.subcategory or '' }}">
+        </div>
+
+        <div class="form-group">
+            <label>Facility Name *</label>
+            <input type="text" name="service_name"
+                   value="{{ service.service_name }}" required>
+        </div>
+
+        <div class="form-group">
+            <label>State *</label>
+            <input type="text" name="state"
+                   value="{{ service.state }}" required>
+        </div>
+
+        <div class="form-group">
+            <label>District</label>
+            <input type="text" name="district"
+                   value="{{ service.district or '' }}">
+        </div>
+
+        <div class="form-group">
+            <label>City</label>
+            <input type="text" name="city"
+                   value="{{ service.city or '' }}">
+        </div>
+
+        <div class="form-group">
+            <label>Full Address *</label>
+            <textarea name="address" rows="3" required>{{ service.address }}</textarea>
+        </div>
+
+        <div class="form-group">
+            <label>Phone Number</label>
+            <input type="text" name="phone"
+                   value="{{ service.phone or '' }}">
+        </div>
+
+        <div class="form-group">
+            <label>Alternate Phone</label>
+            <input type="text" name="alternate_phone"
+                   value="{{ service.alternate_phone or '' }}">
+        </div>
+
+        <div class="form-group">
+            <label>Description</label>
+            <textarea name="description" rows="3">{{ service.description or '' }}</textarea>
+        </div>
+
+        <div class="form-group">
+            <label>Operating Hours</label>
+            <input type="text" name="operating_hours"
+                   value="{{ service.operating_hours or '' }}">
+        </div>
+
+        <div class="form-group">
+            <label>Source / Reference</label>
+            <input type="text" name="source"
+                   value="{{ service.source or '' }}">
+        </div>
+
+        <button type="submit" class="btn btn-primary">
+            Save Changes
+        </button>
+
+        <a href="{{ url_for('emergency_services.admin_list') }}">
+            Cancel
+        </a>
+    </form>
+</div>
+{% endblock %}

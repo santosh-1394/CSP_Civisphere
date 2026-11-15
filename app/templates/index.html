@@ -1,0 +1,446 @@
+
+{% extends "base.html" %}
+
+{% block title %}Citizen Dashboard | CiviSphere{% endblock %}
+
+{% block content %}
+
+<style>
+    .citizen-dashboard {
+        max-width: 1250px;
+        margin: 35px auto;
+        padding: 20px;
+    }
+
+    .welcome-banner {
+        background: linear-gradient(135deg, #1e3a8a, #2563eb);
+        padding: 38px;
+        border-radius: 18px;
+        color: white;
+        margin-bottom: 35px;
+        box-shadow: 0 8px 25px rgba(37, 99, 235, 0.15);
+    }
+
+    .welcome-banner h1 {
+        font-size: 30px;
+        margin-bottom: 12px;
+    }
+
+    .welcome-banner p {
+        color: #dbeafe;
+        line-height: 1.7;
+    }
+
+    .welcome-tagline {
+        margin-top: 12px;
+        font-weight: 600;
+    }
+
+    .explore-heading {
+        margin-bottom: 22px;
+    }
+
+    .explore-heading h2 {
+        font-size: 25px;
+        color: #1e293b;
+        margin-bottom: 7px;
+    }
+
+    .explore-heading p {
+        color: #64748b;
+    }
+
+    .feature-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+    }
+
+    .feature-card {
+        padding: 25px;
+        border-radius: 15px;
+        min-height: 205px;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        border: 1px solid rgba(0,0,0,0.04);
+        transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
+
+    .feature-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+    }
+
+    .feature-icon {
+        width: 52px;
+        height: 52px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(255,255,255,0.75);
+        border-radius: 13px;
+        font-size: 27px;
+        margin-bottom: 17px;
+    }
+
+    .feature-card h3 {
+        font-size: 19px;
+        margin-bottom: 9px;
+        color: #1e293b;
+    }
+
+    .feature-card p {
+        font-size: 14px;
+        line-height: 1.6;
+        color: #475569;
+        margin-bottom: 17px;
+    }
+
+    .feature-link {
+        margin-top: auto;
+        font-size: 14px;
+        font-weight: 700;
+        text-decoration: none;
+    }
+
+    .feature-link:hover {
+        text-decoration: underline;
+    }
+
+    .card-emergency { background: #fee2e2; }
+    .card-emergency .feature-link { color: #b91c1c; }
+
+    .card-complaint { background: #ffedd5; }
+    .card-complaint .feature-link { color: #c2410c; }
+
+    .card-track { background: #e0e7ff; }
+    .card-track .feature-link { color: #4338ca; }
+
+    .card-donors { background: #fce7f3; }
+    .card-donors .feature-link { color: #be185d; }
+
+    .card-locations { background: #dcfce7; }
+    .card-locations .feature-link { color: #15803d; }
+
+    .card-contacts { background: #fef3c7; }
+    .card-contacts .feature-link { color: #a16207; }
+
+    .card-notifications { background: #ede9fe; }
+    .card-notifications .feature-link { color: #6d28d9; }
+
+    .card-feedback { background: #f1f5f9; }
+    .card-feedback .feature-link { color: #475569; }
+
+    .card-chatbot {
+        background: #cffafe;
+        grid-column: span 3;
+        min-height: 150px;
+        flex-direction: row;
+        align-items: center;
+        gap: 20px;
+    }
+
+    .card-chatbot .feature-icon {
+        flex-shrink: 0;
+        margin: 0;
+    }
+
+    .card-chatbot .chatbot-content {
+        flex: 1;
+    }
+
+    .card-chatbot .feature-link {
+        color: #0e7490;
+    }
+
+    .dashboard-footer {
+        background: #0f172a;
+        color: white;
+        text-align: center;
+        padding: 25px 15px;
+        border-radius: 13px;
+        margin-top: 40px;
+    }
+
+    .dashboard-footer p {
+        font-size: 14px;
+        margin: 6px 0;
+    }
+
+    .dashboard-footer .tagline {
+        color: #cbd5e1;
+        font-size: 13px;
+    }
+
+    @media (max-width: 850px) {
+        .feature-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .card-chatbot {
+            grid-column: span 2;
+        }
+    }
+
+    @media (max-width: 550px) {
+        .citizen-dashboard {
+            padding: 12px;
+        }
+
+        .welcome-banner {
+            padding: 25px 20px;
+        }
+
+        .welcome-banner h1 {
+            font-size: 23px;
+        }
+
+        .feature-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .card-chatbot {
+            grid-column: span 1;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+    }
+    
+    /* =====================================
+    CITIZEN DASHBOARD - DARK MODE
+    ===================================== */
+
+    html[data-theme="dark"] .citizen-dashboard .feature-card {
+        background: #171717 !important;
+        border: 1px solid #303030;
+        color: #ffffff !important;
+    }
+
+    html[data-theme="dark"] .citizen-dashboard .feature-card h3 {
+        color: #ffffff !important;
+    }
+
+    html[data-theme="dark"] .citizen-dashboard .feature-card p {
+        color: #b3b3b3 !important;
+    }
+
+    html[data-theme="dark"] .citizen-dashboard .feature-icon {
+        background: #262626 !important;
+    }
+
+    html[data-theme="dark"] .citizen-dashboard .explore-heading h2 {
+        color: #ffffff !important;
+    }
+
+    html[data-theme="dark"] .citizen-dashboard .explore-heading p {
+        color: #b3b3b3 !important;
+    }
+
+    html[data-theme="dark"] .citizen-dashboard .dashboard-footer {
+        background: #171717;
+        border: 1px solid #303030;
+    }
+
+    html[data-theme="dark"] .citizen-dashboard .dashboard-footer .tagline {
+        color: #b3b3b3;
+    }
+
+</style>
+
+<div class="citizen-dashboard">
+
+    <section class="welcome-banner">
+        <h1>Welcome, {{ current_user.full_name }}!</h1>
+
+        <p>Your Community. Your Services. One Platform.</p>
+
+        <p>
+            Access emergency service information and stay
+            connected with your community.
+        </p>
+
+        <p class="welcome-tagline">
+            Together, let's build a better community.
+        </p>
+    </section>
+
+    <section class="explore-heading">
+        <h2>Explore CiviSphere</h2>
+
+        <p>
+            Discover emergency facilities and community services
+            available through one platform.
+        </p>
+    </section>
+
+    <div class="feature-grid">
+
+        <!-- Emergency Services -->
+        <div class="feature-card card-emergency">
+            <div class="feature-icon">🚨</div>
+
+            <h3>Emergency Services Directory</h3>
+
+            <p>
+                Find hospitals, police stations, fire stations,
+                ambulance services, blood banks and more.
+            </p>
+
+            <a href="{{ url_for('emergency_services.emergency_services_home') }}"
+               class="feature-link">
+                Explore Emergency Services →
+            </a>
+        </div>
+
+        <!-- Submit Complaint -->
+        <div class="feature-card card-complaint">
+            <div class="feature-icon">📝</div>
+
+            <h3>Submit a Complaint</h3>
+
+            <p>
+                Report public service issues and help
+                improve your community.
+            </p>
+
+            <a href="{{ url_for('complaints.submit_complaint') }}"
+               class="feature-link">
+                Submit Complaint →
+            </a>
+        </div>
+
+        <!-- Track Complaints -->
+        <div class="feature-card card-track">
+            <div class="feature-icon">🔍</div>
+
+            <h3>Track Complaints</h3>
+
+            <p>
+                Check your complaint tracking ID
+                and view its latest status.
+            </p>
+
+            <a href="{{ url_for('complaints.track_complaint') }}"
+               class="feature-link">
+                Track Complaint →
+            </a>
+        </div>
+
+        <!-- Blood Donors -->
+        <div class="feature-card card-donors">
+            <div class="feature-icon">🩸</div>
+
+            <h3>Blood Donor Directory</h3>
+
+            <p>
+                Find voluntary blood donors
+                and connect with the community.
+            </p>
+
+            <a href="{{ url_for('donors.donor_list') }}"
+               class="feature-link">
+                Find Donors →
+            </a>
+        </div>
+
+        <!-- Locations -->
+        <div class="feature-card card-locations">
+            <div class="feature-icon">📍</div>
+
+            <h3>Service Locations</h3>
+
+            <p>
+                Discover public service locations
+                and useful facilities.
+            </p>
+
+            <a href="{{ url_for('locations.location_list') }}"
+               class="feature-link">
+                Explore Locations →
+            </a>
+        </div>
+
+        <!-- Contacts -->
+        <div class="feature-card card-contacts">
+            <div class="feature-icon">📞</div>
+
+            <h3>Important Contacts</h3>
+
+            <p>
+                Find important public service
+                and community contact details.
+            </p>
+
+            <a href="{{ url_for('contacts.contact_list') }}"
+               class="feature-link">
+                View Contacts →
+            </a>
+        </div>
+
+        <!-- Notifications -->
+        <div class="feature-card card-notifications">
+            <div class="feature-icon">🔔</div>
+
+            <h3>Notifications</h3>
+
+            <p>
+                Stay updated with complaint
+                progress and important alerts.
+            </p>
+
+            <a href="{{ url_for('notifications.notification_list') }}"
+               class="feature-link">
+                View Notifications →
+            </a>
+        </div>
+
+        <!-- Feedback -->
+        <div class="feature-card card-feedback">
+            <div class="feature-icon">⭐</div>
+
+            <h3>Feedback</h3>
+
+            <p>
+                Share your experience and suggestions
+                to help us improve our services.
+            </p>
+
+            <a href="{{ url_for('feedback.feedback_list') }}"
+               class="feature-link">
+                Share Feedback →
+            </a>
+        </div>
+
+        <!-- Chatbot -->
+        <div class="feature-card card-chatbot">
+            <div class="feature-icon">🤖</div>
+
+            <div class="chatbot-content">
+                <h3>Chatbot Assistant</h3>
+
+                <p>
+                    Get help and answers to common questions
+                    through the CiviSphere assistant.
+                </p>
+
+                <a href="{{ url_for('chatbot.chatbot_page') }}"
+                   class="feature-link">
+                    Chat with Assistant →
+                </a>
+            </div>
+        </div>
+
+    </div>
+
+    <footer class="dashboard-footer">
+        <p>© 2026 CiviSphere. All Rights Reserved.</p>
+
+        <p class="tagline">
+            Your Community. Your Services. One Platform.
+        </p>
+    </footer>
+
+</div>
+
+{% endblock %}

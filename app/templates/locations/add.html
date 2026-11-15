@@ -1,0 +1,62 @@
+
+{% extends "base.html" %}
+
+{% block title %}Add Location | CiviSphere{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width:750px; margin:40px auto; padding:20px;">
+
+    <h1>Add New Service Location</h1>
+    <p>Enter the details of the new community service location.</p>
+
+    <form method="POST" action="{{ url_for('locations.add_location') }}"
+          style="background:white; padding:25px; border-radius:12px; box-shadow:0 2px 12px rgba(0,0,0,0.08);">
+
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+        <label>Location Name *</label>
+        <input type="text" name="location_name" required maxlength="100"
+               placeholder="Example: Government Hospital"
+               style="width:100%; padding:12px; margin:8px 0 18px;">
+
+        <label>Address</label>
+        <textarea name="address" rows="3"
+                  placeholder="Enter complete address"
+                  style="width:100%; padding:12px; margin:8px 0 18px;"></textarea>
+
+        <label>District</label>
+        <input type="text" name="district" maxlength="100"
+               placeholder="Example: Krishna"
+               style="width:100%; padding:12px; margin:8px 0 18px;">
+
+        <label>Phone Number</label>
+        <input type="tel" name="phone" maxlength="15"
+               placeholder="Enter contact number"
+               style="width:100%; padding:12px; margin:8px 0 18px;">
+
+        <h3>Map Coordinates</h3>
+        <p>Coordinates are optional. Add them to display the location on the map.</p>
+
+        <label>Latitude</label>
+        <input type="number" name="latitude" step="any" min="-90" max="90"
+               placeholder="Example: 16.5062"
+               style="width:100%; padding:12px; margin:8px 0 18px;">
+
+        <label>Longitude</label>
+        <input type="number" name="longitude" step="any" min="-180" max="180"
+               placeholder="Example: 80.6480"
+               style="width:100%; padding:12px; margin:8px 0 25px;">
+
+        <button type="submit" class="btn-primary"
+                style="padding:12px 22px; border:none; border-radius:8px; cursor:pointer;">
+            Add Location
+        </button>
+
+        <a href="{{ url_for('locations.admin_location_list') }}"
+           style="margin-left:12px; text-decoration:none;">
+            Cancel
+        </a>
+
+    </form>
+</div>
+{% endblock %}

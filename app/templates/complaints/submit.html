@@ -1,0 +1,80 @@
+
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container" style="max-width: 750px; margin: 40px auto;">
+
+    <h1>Submit a Complaint</h1>
+    <p>Report a public service issue. Our team will review your complaint.</p>
+
+    <form method="POST"
+          action="{{ url_for('complaints.submit_complaint') }}"
+          enctype="multipart/form-data">
+
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+        <div style="margin-bottom: 20px;">
+            <label for="subject">Complaint Subject *</label>
+            <input
+                type="text"
+                id="subject"
+                name="subject"
+                maxlength="150"
+                placeholder="Example: Water supply problem"
+                required
+                style="width:100%; padding:12px; margin-top:8px;"
+            >
+        </div>
+
+        <div style="margin-bottom: 20px;">
+            <label for="description">Complaint Description *</label>
+            <textarea
+                id="description"
+                name="description"
+                rows="6"
+                placeholder="Explain your problem in detail..."
+                required
+                style="width:100%; padding:12px; margin-top:8px;"
+            ></textarea>
+        </div>
+
+        <div style="margin-bottom: 20px;">
+            <label for="location">Location</label>
+            <input
+                type="text"
+                id="location"
+                name="location"
+                maxlength="150"
+                placeholder="Enter your area or village"
+                style="width:100%; padding:12px; margin-top:8px;"
+            >
+        </div>
+
+        <div style="margin-bottom: 25px;">
+            <label for="attachment">Supporting Document (Optional)</label>
+            <input
+                type="file"
+                id="attachment"
+                name="attachment"
+                accept=".pdf,.png,.jpg,.jpeg,.doc,.docx"
+                style="display:block; margin-top:10px;"
+            >
+            <small>Allowed: PDF, PNG, JPG, JPEG, DOC, DOCX. Maximum size: 5 MB.</small>
+        </div>
+
+        <button type="submit"
+                style="padding:12px 25px; cursor:pointer;">
+            Submit Complaint
+        </button>
+
+        <a href="{{ url_for('complaints.my_complaints') }}"
+           style="margin-left:15px;">
+            Cancel
+        </a>
+
+    </form>
+
+</div>
+
+{% endblock %}

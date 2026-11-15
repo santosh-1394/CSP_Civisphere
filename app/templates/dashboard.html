@@ -1,0 +1,224 @@
+
+{% extends "base.html" %}
+
+{% block content %}
+
+<style>
+    .dashboard {
+        max-width: 1200px;
+        margin: 30px auto;
+        padding: 20px;
+    }
+
+    .welcome-section {
+        background: linear-gradient(120deg, #1d4ed8, #4338ca);
+        color: white;
+        padding: 35px;
+        border-radius: 16px;
+        margin-bottom: 30px;
+    }
+
+    .welcome-section h1 {
+        font-size: 30px;
+        margin-bottom: 10px;
+    }
+
+    .welcome-section p {
+        color: #e0e7ff;
+    }
+
+    .section-heading {
+        margin-bottom: 20px;
+        color: #172554;
+    }
+
+    .dashboard-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+    }
+
+    .dashboard-card {
+        background: white;
+        border: 1px solid #e2e8f0;
+        padding: 25px;
+        border-radius: 14px;
+        transition: 0.2s;
+        box-shadow: 0 3px 12px rgba(0,0,0,0.04);
+    }
+
+    .dashboard-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.09);
+    }
+
+    .card-icon {
+        font-size: 34px;
+        margin-bottom: 15px;
+    }
+
+    .dashboard-card h3 {
+        color: #1e293b;
+        margin-bottom: 10px;
+    }
+
+    .dashboard-card p {
+        color: #64748b;
+        font-size: 14px;
+        line-height: 1.6;
+        min-height: 45px;
+    }
+
+    .dashboard-card a {
+        display: inline-block;
+        margin-top: 15px;
+        color: #2563eb;
+        font-weight: 600;
+        text-decoration: none;
+    }
+
+    .dashboard-card a:hover {
+        text-decoration: underline;
+    }
+
+    .coming-soon {
+        display: inline-block;
+        margin-top: 15px;
+        color: #64748b;
+        font-size: 13px;
+    }
+
+    .dashboard-footer {
+        text-align: center;
+        color: #64748b;
+        margin-top: 40px;
+        font-size: 13px;
+    }
+
+    @media (max-width: 600px) {
+        .welcome-section {
+            padding: 25px;
+        }
+
+        .welcome-section h1 {
+            font-size: 24px;
+        }
+    }
+</style>
+
+<div class="dashboard">
+
+    <section class="welcome-section">
+        <h1>Welcome, {{ current_user.full_name }}!</h1>
+        <p>Your Community. Your Services. One Platform.</p>
+        <p>
+            Access citizen services and stay connected with your community.
+        </p>
+    </section>
+
+    <h2 class="section-heading">Explore CiviSphere</h2>
+
+    <div class="dashboard-grid">
+
+        <!-- Citizen Services -->
+        <div class="dashboard-card">
+            <div class="card-icon">🏛️</div>
+            <h3>Citizen Services</h3>
+            <p>Explore public services and useful information.</p>
+            <a href="{{ url_for('services.list_services') }}">
+                Explore Services →
+            </a>
+        </div>
+
+        <!-- Submit Complaint -->
+        <div class="dashboard-card">
+            <div class="card-icon">📝</div>
+            <h3>Submit a Complaint</h3>
+            <p>Submit complaints about public services.</p>
+            <a href="{{ url_for('complaints.submit_complaint') }}">
+                Submit Complaint →
+            </a>
+        </div>
+
+        <!-- Track Complaints -->
+        <div class="dashboard-card">
+            <div class="card-icon">🔍</div>
+            <h3>Track Complaints</h3>
+            <p>Check complaint status using your tracking ID.</p>
+            <a href="{{ url_for('complaints.track_complaint') }}">
+                Track Complaint →
+            </a>
+        </div>
+
+        <!-- Blood Donors -->
+        <div class="dashboard-card">
+            <div class="card-icon">🩸</div>
+            <h3>Blood Donor Directory</h3>
+            <p>Find voluntary blood donors in your area.</p>
+            <a href="{{ url_for('donors.donor_list') }}">
+                View Donors →
+            </a>
+        </div>
+
+        
+        <!-- Locations -->
+        <div class="dashboard-card">
+            <div class="card-icon">📍</div>
+            <h3>Service Locations</h3>
+            <p>Discover nearby public service locations.</p>
+            <a href="{{ url_for('locations.location_list') }}">
+                Explore Locations →
+            </a>
+        </div>
+
+
+        <!-- Important Contacts -->
+        <div class="dashboard-card">
+            <div class="card-icon">📞</div>
+            <h3>Important Contacts</h3>
+            <p>Find useful community and public contacts.</p>
+            <a href="{{ url_for('contacts.contact_list') }}">
+                View Contacts →
+            </a>
+        </div>
+
+        <!-- Notifications -->
+        <div class="dashboard-card">
+            <div class="card-icon">🔔</div>
+            <h3>Notifications</h3>
+            <p>View updates and important notifications.</p>
+            <a href="{{ url_for('notifications.notification_list') }}">
+                View Notifications →
+            </a>
+        </div>
+
+        <!-- Feedback -->
+        <div class="dashboard-card">
+            <div class="card-icon">⭐</div>
+            <h3>Feedback</h3>
+            <p>Share your experience and suggestions.</p>
+            <a href="{{ url_for('feedback.feedback_list') }}">
+                Share Feedback →
+            </a>
+        </div>
+
+        <!-- Chatbot -->
+        <div class="dashboard-card">
+            <div class="card-icon">🤖</div>
+            <h3>Chatbot Assistant</h3>
+            <p>Get help and answers to common questions.</p>
+            <a href="{{ url_for('chatbot.chatbot_page') }}">
+                Chat with Assistant →
+            </a>
+        </div>
+
+    </div>
+
+    <div class="dashboard-footer">
+        <p>© 2026 CiviSphere. All Rights Reserved.</p>
+        <p>Your Community. Your Services. One Platform.</p>
+    </div>
+
+</div>
+
+{% endblock %}

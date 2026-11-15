@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="page-container">
+
+    <div class="page-header">
+        <div>
+            <h1>Notifications</h1>
+            <p>Stay updated about your complaints and activities.</p>
+        </div>
+
+        <div class="notification-count">
+            Unread: {{ unread_count }}
+        </div>
+    </div>
+
+    {% if notifications %}
+
+        <div class="notification-list">
+
+            {% for item in notifications %}
+
+                <div class="notification-card {% if not item.is_read %}unread{% endif %}">
+
+                    <div class="notification-content">
+
+                        <h3>{{ item.title }}</h3>
+
+                        <p>{{ item.message }}</p>
+
+                        <small>
+                            {{ item.created_at }}
+                        </small>
+
+                        {% if not item.is_read %}
+                            <span class="unread-label">New</span>
+                        {% else %}
+                            <span class="read-label">Read</span>
+                        {% endif %}
+
+                    </div>
+
+                    <a href="{{ url_for('notifications.open_notification', notification_id=item.notification_id) }}"
+                       class="btn-primary">
+                        Open
+                    </a>
+
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+    {% else %}
+
+        <div class="empty-state">
+            <h3>No notifications yet</h3>
+            <p>Your notifications will appear here.</p>
+        </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,291 @@
+
+{% extends "base.html" %}
+
+{% block title %}User Management | CiviSphere{% endblock %}
+
+{% block content %}
+
+<style>
+    .users-container {
+        max-width: 1200px;
+        margin: 30px auto;
+        padding: 20px;
+    }
+
+    .users-header {
+        background: linear-gradient(135deg, #1e40af, #2563eb);
+        color: white;
+        padding: 28px;
+        border-radius: 14px;
+        margin-bottom: 25px;
+    }
+
+    .users-header h1 {
+        margin-bottom: 8px;
+    }
+
+    .user-stats {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 18px;
+        margin-bottom: 25px;
+    }
+
+    .stat-card {
+        background: white;
+        padding: 22px;
+        border-radius: 12px;
+        border: 1px solid #e2e8f0;
+    }
+
+    .stat-card h2 {
+        color: #2563eb;
+        margin-bottom: 6px;
+    }
+
+    .search-form {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+
+    .search-form input {
+        flex: 1;
+        padding: 12px;
+        border: 1px solid #cbd5e1;
+        border-radius: 7px;
+        min-width: 0;
+    }
+
+    .search-form button {
+        padding: 12px 20px;
+        background: #2563eb;
+        color: white;
+        border: none;
+        border-radius: 7px;
+        cursor: pointer;
+    }
+
+    .table-wrapper {
+        background: white;
+        border-radius: 12px;
+        overflow-x: auto;
+        border: 1px solid #e2e8f0;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 750px;
+    }
+
+    th, td {
+        padding: 15px;
+        text-align: left;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    th {
+        background: #eff6ff;
+        color: #1e40af;
+    }
+
+    .status {
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: bold;
+    }
+
+    .active {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .inactive {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+
+    .role {
+        text-transform: capitalize;
+    }
+
+    .action-btn {
+        padding: 8px 12px;
+        border: none;
+        border-radius: 6px;
+        color: white;
+        cursor: pointer;
+        font-weight: 600;
+    }
+
+    .deactivate-btn {
+        background: #dc2626;
+    }
+
+    .activate-btn {
+        background: #16a34a;
+    }
+
+    .back-link {
+        display: inline-block;
+        margin-top: 25px;
+        color: #2563eb;
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+    @media(max-width: 650px) {
+        .user-stats {
+            grid-template-columns: 1fr;
+        }
+
+        .users-container {
+            padding: 12px;
+        }
+    }
+</style>
+
+<div class="users-container">
+
+    <div class="users-header">
+        <h1>👥 User Management</h1>
+        <p>View, search and manage CiviSphere citizen accounts.</p>
+    </div>
+
+    <!-- User Statistics -->
+    <div class="user-stats">
+
+        <div class="stat-card">
+            <h2>{{ total_users }}</h2>
+            <p>Total Users</p>
+        </div>
+
+        <div class="stat-card">
+            <h2>{{ active_users }}</h2>
+            <p>Active Users</p>
+        </div>
+
+        <div class="stat-card">
+            <h2>{{ inactive_users }}</h2>
+            <p>Inactive Users</p>
+        </div>
+
+    </div>
+
+    <!-- Search -->
+    <form method="GET"
+          action="{{ url_for('admin.user_management') }}"
+          class="search-form">
+
+        <input
+            type="text"
+            name="search"
+            placeholder="Search by name or email..."
+            value="{{ search }}"
+        >
+
+        <button type="submit">Search</button>
+
+    </form>
+
+    <!-- Users Table -->
+    <div class="table-wrapper">
+
+        <table>
+
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Full Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Role</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                {% for user in users %}
+
+                <tr>
+
+                    <td>{{ user.user_id }}</td>
+
+                    <td>{{ user.full_name }}</td>
+
+                    <td>{{ user.email }}</td>
+
+                    <td>{{ user.phone or 'Not provided' }}</td>
+
+                    <td class="role">{{ user.user_role }}</td>
+
+                    <td>
+                        {% if user.is_active %}
+                            <span class="status active">Active</span>
+                        {% else %}
+                            <span class="status inactive">Inactive</span>
+                        {% endif %}
+                    </td>
+
+                    <td>
+
+                        {% if user.user_role|lower == 'admin' %}
+
+                            <span>Protected</span>
+
+                        {% else %}
+
+                            <form method="POST"
+                                  action="{{ url_for('admin.toggle_user_status', user_id=user.user_id) }}"
+                                  onsubmit="return confirm('Are you sure you want to change this user status?');">
+
+                                <input type="hidden"
+                                       name="csrf_token"
+                                       value="{{ csrf_token() }}">
+
+                                {% if user.is_active %}
+                                    <button type="submit"
+                                            class="action-btn deactivate-btn">
+                                        Deactivate
+                                    </button>
+                                {% else %}
+                                    <button type="submit"
+                                            class="action-btn activate-btn">
+                                        Activate
+                                    </button>
+                                {% endif %}
+
+                            </form>
+
+                        {% endif %}
+
+                    </td>
+
+                </tr>
+
+                {% else %}
+
+                <tr>
+                    <td colspan="7">No users found.</td>
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+    <a href="{{ url_for('admin.admin_dashboard') }}"
+       class="back-link">
+        ← Back to Admin Dashboard
+    </a>
+
+</div>
+
+{% endblock %}

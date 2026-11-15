@@ -1,0 +1,41 @@
+
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container" style="max-width:600px; margin:50px auto;">
+
+    <h1>Track Your Complaint</h1>
+    <p>Enter your complaint tracking ID to check its current status.</p>
+
+    <form method="POST"
+          action="{{ url_for('complaints.track_complaint') }}">
+
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+        <label for="tracking_id">Tracking ID</label>
+
+        <input
+            type="text"
+            id="tracking_id"
+            name="tracking_id"
+            placeholder="Example: CIV-XXXXXXXXXX"
+            required
+            style="width:100%; padding:12px; margin:12px 0 20px;"
+        >
+
+        <button type="submit" style="padding:12px 25px;">
+            Track Complaint
+        </button>
+
+    </form>
+
+    <p style="margin-top:20px;">
+        <a href="{{ url_for('complaints.my_complaints') }}">
+            Back to My Complaints
+        </a>
+    </p>
+
+</div>
+
+{% endblock %}

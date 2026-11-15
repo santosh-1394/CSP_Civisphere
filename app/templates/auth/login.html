@@ -1,0 +1,272 @@
+
+{% extends "base.html" %}
+
+{% block title %}Login - CiviSphere{% endblock %}
+
+{% block extra_css %}
+<style>
+/* LOGIN PAGE */
+
+.login-page {
+    min-height: calc(100vh - 180px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 45px 20px;
+}
+
+.login-card {
+    width: 100%;
+    max-width: 440px;
+    padding: 38px;
+    background: var(--card-bg);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+    border-radius: 18px;
+    box-shadow: var(--shadow);
+}
+
+.login-logo {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.login-logo h1 {
+    font-size: 32px;
+    color: #2563eb;
+    margin-bottom: 7px;
+}
+
+.login-logo p {
+    color: var(--muted-text);
+    font-size: 13px;
+}
+
+.login-card h2 {
+    font-size: 25px;
+    margin-bottom: 8px;
+    color: var(--text-color);
+}
+
+.login-subtitle {
+    color: var(--muted-text);
+    font-size: 14px;
+    margin-bottom: 25px;
+}
+
+.login-form-group {
+    margin-bottom: 20px;
+}
+
+.login-form-group label {
+    display: block;
+    color: var(--text-color);
+    font-weight: 600;
+    font-size: 14px;
+    margin-bottom: 8px;
+}
+
+.login-form-group input {
+    display: block;
+    width: 100%;
+    padding: 14px;
+    background: var(--input-bg);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+    border-radius: 9px;
+    font-size: 14px;
+}
+
+.login-form-group input:focus {
+    outline: none;
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+.login-submit {
+    display: block;
+    width: 100%;
+    padding: 14px;
+    margin-top: 8px;
+    background: #2563eb;
+    color: #ffffff;
+    border: none;
+    border-radius: 9px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.login-submit:hover {
+    background: #1d4ed8;
+}
+
+.login-register-link {
+    text-align: center;
+    margin-top: 25px;
+    color: var(--muted-text);
+    font-size: 14px;
+}
+
+.login-register-link a {
+    display: inline-block;
+    margin-top: 5px;
+    color: #3b82f6;
+    font-weight: 700;
+}
+
+.login-register-link a:hover {
+    text-decoration: underline;
+}
+
+/* Flash messages */
+
+.login-message {
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    font-size: 13px;
+}
+
+.login-message.error,
+.login-message.danger {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.login-message.success {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.login-message.warning {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.login-message.info {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+/* Dark mode */
+
+html[data-theme="dark"] .login-card {
+    background: #171717 !important;
+    color: #ffffff !important;
+    border-color: #303030 !important;
+}
+
+html[data-theme="dark"] .login-card h2,
+html[data-theme="dark"] .login-form-group label {
+    color: #ffffff !important;
+}
+
+html[data-theme="dark"] .login-logo p,
+html[data-theme="dark"] .login-subtitle,
+html[data-theme="dark"] .login-register-link {
+    color: #b3b3b3 !important;
+}
+
+html[data-theme="dark"] .login-form-group input {
+    background: #262626 !important;
+    color: #ffffff !important;
+    border-color: #303030 !important;
+}
+
+html[data-theme="dark"] .login-form-group input::placeholder {
+    color: #b3b3b3 !important;
+}
+
+@media (max-width: 500px) {
+    .login-page {
+        padding: 25px 15px;
+    }
+
+    .login-card {
+        padding: 27px 22px;
+    }
+
+    .login-logo h1 {
+        font-size: 28px;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="login-page">
+
+    <div class="login-card">
+
+        <div class="login-logo">
+            <h1>CiviSphere</h1>
+            <p>Your Community. Your Services. One Platform.</p>
+        </div>
+
+        <h2>Welcome Back!</h2>
+
+        <p class="login-subtitle">
+            Login to access your citizen account.
+        </p>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% for category, message in messages %}
+                <div class="login-message {{ category }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endwith %}
+
+        <form method="POST" action="{{ url_for('auth.login') }}">
+
+            <input type="hidden"
+                   name="csrf_token"
+                   value="{{ csrf_token() }}">
+
+            <div class="login-form-group">
+                <label for="login-email">Email Address</label>
+
+                <input
+                    type="email"
+                    id="login-email"
+                    name="email"
+                    placeholder="Enter your email"
+                    autocomplete="email"
+                    required
+                >
+            </div>
+
+            <div class="login-form-group">
+                <label for="login-password">Password</label>
+
+                <input
+                    type="password"
+                    id="login-password"
+                    name="password"
+                    placeholder="Enter your password"
+                    autocomplete="current-password"
+                    required
+                >
+            </div>
+
+            <button type="submit" class="login-submit">
+                Login
+            </button>
+
+        </form>
+
+        <div class="login-register-link">
+            Don't have an account?
+            <br>
+            <a href="{{ url_for('auth.register') }}">
+                Register Now
+            </a>
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

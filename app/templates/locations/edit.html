@@ -1,0 +1,94 @@
+
+{% extends "base.html" %}
+
+{% block title %}Edit Location | CiviSphere{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width:750px; margin:40px auto; padding:20px;">
+
+    <h1>Edit Service Location</h1>
+    <p>Update the location information below.</p>
+
+    <form method="POST"
+          action="{{ url_for('locations.edit_location', location_id=location.location_id) }}"
+          style="background:white; padding:25px; border-radius:12px; box-shadow:0 2px 12px rgba(0,0,0,0.08);">
+
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+        <label>Location Name *</label>
+        <input
+            type="text"
+            name="location_name"
+            value="{{ location.location_name }}"
+            required
+            maxlength="100"
+            style="width:100%; padding:12px; margin:8px 0 18px;"
+        >
+
+        <label>Address</label>
+        <textarea
+            name="address"
+            rows="3"
+            style="width:100%; padding:12px; margin:8px 0 18px;"
+        >{{ location.address or '' }}</textarea>
+
+        <label>District</label>
+        <input
+            type="text"
+            name="district"
+            value="{{ location.district or '' }}"
+            maxlength="100"
+            style="width:100%; padding:12px; margin:8px 0 18px;"
+        >
+
+        <label>Phone Number</label>
+        <input
+            type="tel"
+            name="phone"
+            value="{{ location.phone or '' }}"
+            maxlength="15"
+            style="width:100%; padding:12px; margin:8px 0 18px;"
+        >
+
+        <h3>Map Coordinates</h3>
+
+        <label>Latitude</label>
+        <input
+            type="number"
+            name="latitude"
+            value="{{ location.latitude if location.latitude is not none else '' }}"
+            step="any"
+            min="-90"
+            max="90"
+            style="width:100%; padding:12px; margin:8px 0 18px;"
+        >
+
+        <label>Longitude</label>
+        <input
+            type="number"
+            name="longitude"
+            value="{{ location.longitude if location.longitude is not none else '' }}"
+            step="any"
+            min="-180"
+            max="180"
+            style="width:100%; padding:12px; margin:8px 0 25px;"
+        >
+
+        <button
+            type="submit"
+            class="btn-primary"
+            style="padding:12px 22px; border:none; border-radius:8px; cursor:pointer;"
+        >
+            Save Changes
+        </button>
+
+        <a
+            href="{{ url_for('locations.admin_location_list') }}"
+            style="margin-left:12px; text-decoration:none;"
+        >
+            Cancel
+        </a>
+
+    </form>
+</div>
+{% endblock %}

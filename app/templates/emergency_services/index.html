@@ -1,0 +1,293 @@
+
+{% extends "base.html" %}
+
+{% block title %}Emergency Services | CiviSphere{% endblock %}
+
+{% block extra_css %}
+<style>
+    .emergency-page {
+        padding: 30px 0 55px;
+    }
+
+    .emergency-hero {
+        background: linear-gradient(135deg, #123b78, #1674d1);
+        color: white;
+        padding: 55px 35px;
+        border-radius: 22px;
+        text-align: center;
+        margin-bottom: 35px;
+        box-shadow: 0 12px 30px rgba(18, 59, 120, 0.18);
+    }
+
+    .emergency-hero h1 {
+        font-size: 36px;
+        font-weight: 800;
+        margin-bottom: 15px;
+    }
+
+    .emergency-hero p {
+        max-width: 700px;
+        margin: 0 auto;
+        font-size: 16px;
+        line-height: 1.7;
+        color: #eaf3ff;
+    }
+
+    .emergency-note {
+        background: #fff7ed;
+        border: 1px solid #fed7aa;
+        color: #9a3412;
+        padding: 14px 18px;
+        border-radius: 12px;
+        margin: 25px 0 35px;
+        font-size: 14px;
+    }
+
+    .section-heading {
+        text-align: center;
+        margin-bottom: 28px;
+    }
+
+    .section-heading h2 {
+        color: #173b70;
+        font-size: 27px;
+        font-weight: 750;
+        margin-bottom: 8px;
+    }
+
+    .section-heading p {
+        color: #64748b;
+        margin: 0;
+    }
+
+    .emergency-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 22px;
+    }
+
+    .emergency-card {
+        display: block;
+        text-decoration: none;
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 17px;
+        padding: 25px 20px;
+        min-height: 225px;
+        box-shadow: 0 5px 18px rgba(15, 23, 42, 0.05);
+        transition: transform 0.25s ease, box-shadow 0.25s ease;
+        color: #1e293b;
+    }
+
+    .emergency-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 13px 28px rgba(15, 23, 42, 0.12);
+        text-decoration: none;
+        color: #1e293b;
+    }
+
+    .emergency-icon {
+        width: 62px;
+        height: 62px;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 31px;
+        margin-bottom: 18px;
+    }
+
+    .hospital-icon { background: #e0f2fe; }
+    .fire-icon { background: #fee2e2; }
+    .police-icon { background: #dbeafe; }
+    .ambulance-icon { background: #dcfce7; }
+    .blood-icon { background: #ffe4e6; }
+    .pharmacy-icon { background: #f3e8ff; }
+    .disaster-icon { background: #fef3c7; }
+    .veterinary-icon { background: #ccfbf1; }
+
+    .emergency-card h3 {
+        font-size: 18px;
+        font-weight: 750;
+        margin-bottom: 10px;
+        color: #173b70;
+    }
+
+    .emergency-card p {
+        color: #64748b;
+        font-size: 13px;
+        line-height: 1.6;
+        margin-bottom: 17px;
+    }
+
+    .card-link {
+        color: #1674d1;
+        font-size: 14px;
+        font-weight: 700;
+    }
+
+    .emergency-help {
+        margin-top: 40px;
+        padding: 25px;
+        background: #eff6ff;
+        border: 1px solid #bfdbfe;
+        border-radius: 16px;
+        text-align: center;
+    }
+
+    .emergency-help h3 {
+        color: #173b70;
+        font-weight: 750;
+        margin-bottom: 8px;
+    }
+
+    .emergency-number {
+        font-size: 32px;
+        font-weight: 850;
+        color: #dc2626;
+        margin: 8px 0;
+    }
+
+    .emergency-help p {
+        color: #475569;
+        font-size: 14px;
+        margin-bottom: 0;
+    }
+
+    @media (max-width: 1000px) {
+        .emergency-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+    }
+
+    @media (max-width: 600px) {
+        .emergency-page {
+            padding-top: 18px;
+        }
+
+        .emergency-hero {
+            padding: 35px 20px;
+        }
+
+        .emergency-hero h1 {
+            font-size: 27px;
+        }
+
+        .emergency-grid {
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+
+        .emergency-card {
+            min-height: auto;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="emergency-page">
+
+    <section class="emergency-hero">
+        <h1>Emergency Services Directory</h1>
+        <p>
+            Find hospitals, police stations, fire stations, ambulance
+            services and other emergency facilities across India
+            through one unified platform.
+        </p>
+    </section>
+
+    <div class="emergency-note">
+        <strong>Important:</strong>
+        Emergency facility information is being added and verified.
+        Always confirm contact details before relying on a listing.
+        For immediate emergency assistance in India, call 112.
+    </div>
+
+    <div class="section-heading">
+        <h2>Explore Emergency Services</h2>
+        <p>Select a category to find facilities in your state, district or city.</p>
+    </div>
+
+    {% set service_cards = [
+        {
+            "name": "Hospitals",
+            "icon": "🏥",
+            "description": "Find government, private and speciality hospitals.",
+            "class": "hospital-icon"
+        },
+        {
+            "name": "Fire Stations",
+            "icon": "🚒",
+            "description": "Locate fire stations and fire emergency facilities.",
+            "class": "fire-icon"
+        },
+        {
+            "name": "Police Stations",
+            "icon": "👮",
+            "description": "Find nearby police stations and contact information.",
+            "class": "police-icon"
+        },
+        {
+            "name": "Ambulance Services",
+            "icon": "🚑",
+            "description": "Find ambulance providers and emergency transport.",
+            "class": "ambulance-icon"
+        },
+        {
+            "name": "Blood Banks",
+            "icon": "🩸",
+            "description": "Locate blood banks and blood donation facilities.",
+            "class": "blood-icon"
+        },
+        {
+            "name": "Emergency Pharmacies",
+            "icon": "💊",
+            "description": "Find pharmacies for urgent medicine requirements.",
+            "class": "pharmacy-icon"
+        },
+        {
+            "name": "Disaster Management and Rescue Centres",
+            "icon": "🛟",
+            "description": "Find disaster response, rescue and relief centres.",
+            "class": "disaster-icon"
+        },
+        {
+            "name": "Veterinary Emergency Services",
+            "icon": "🐾",
+            "description": "Find veterinary hospitals and animal emergency care.",
+            "class": "veterinary-icon"
+        }
+    ] %}
+
+    <div class="emergency-grid">
+        {% for category in service_cards %}
+        <a class="emergency-card"
+           href="{{ url_for('emergency_services.category_list', category=category.name) }}">
+
+            <div class="emergency-icon {{ category.class }}">
+                {{ category.icon }}
+            </div>
+
+            <h3>{{ category.name }}</h3>
+
+            <p>{{ category.description }}</p>
+
+            <span class="card-link">
+                Explore Facilities →
+            </span>
+        </a>
+        {% endfor %}
+    </div>
+
+    <section class="emergency-help">
+        <h3>Need Immediate Emergency Assistance?</h3>
+        <div class="emergency-number">112</div>
+        <p>
+            Call India's integrated emergency response number
+            for urgent assistance.
+        </p>
+    </section>
+
+</div>
+{% endblock %}

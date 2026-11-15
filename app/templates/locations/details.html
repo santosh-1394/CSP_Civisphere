@@ -1,0 +1,764 @@
+
+{% extends "base.html" %}
+
+{% block title %}{{ location.location_name }} | CiviSphere{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+
+<style>
+.location-details-page {
+    max-width: 1200px;
+    margin: 25px auto;
+    padding: 15px;
+}
+
+.back-link {
+    display: inline-block;
+    color: #1769aa;
+    text-decoration: none;
+    font-weight: 600;
+    margin-bottom: 20px;
+}
+
+.location-header {
+    background: linear-gradient(135deg, #0b3d91, #1683d8);
+    color: white;
+    padding: 32px;
+    border-radius: 16px;
+    margin-bottom: 24px;
+}
+
+.location-header h1 {
+    font-size: 30px;
+    margin: 0 0 10px;
+}
+
+.location-header p {
+    margin: 5px 0;
+}
+
+.details-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 16px;
+    margin-bottom: 25px;
+}
+
+.detail-card {
+    background: white;
+    padding: 20px;
+    border: 1px solid #e2e8f0;
+    border-radius: 13px;
+    box-shadow: 0 3px 12px rgba(0,0,0,.04);
+}
+
+.detail-card .icon {
+    font-size: 25px;
+    margin-bottom: 10px;
+}
+
+.detail-card h3 {
+    color: #64748b;
+    font-size: 14px;
+    margin-bottom: 8px;
+}
+
+.detail-card p {
+    color: #173b65;
+    font-weight: 600;
+    overflow-wrap: anywhere;
+    margin: 0;
+}
+
+.map-card {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 4px 16px rgba(0,0,0,.06);
+}
+
+.map-heading {
+    padding: 20px 22px 5px;
+}
+
+.map-heading h2 {
+    color: #123d70;
+    margin: 0 0 7px;
+}
+
+.map-heading p {
+    color: #64748b;
+    margin: 0 0 15px;
+}
+
+/* Map search controls */
+
+.map-search-area {
+    position: relative;
+    z-index: 500;
+    display: flex;
+    gap: 8px;
+    padding: 12px 16px;
+    background: #fff;
+    border-bottom: 1px solid #e5e7eb;
+    flex-wrap: wrap;
+}
+
+.map-search-area input {
+    flex: 1;
+    min-width: 180px;
+    padding: 12px 15px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 14px;
+    outline: none;
+}
+
+.map-search-area input:focus {
+    border-color: #1769aa;
+    box-shadow: 0 0 0 3px rgba(23,105,170,.12);
+}
+
+.map-action-button {
+    border: none;
+    background: #1769aa;
+    color: white;
+    padding: 11px 15px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.map-action-button:hover {
+    background: #0b3d91;
+}
+
+.map-secondary-button {
+    background: #eef5fc;
+    color: #174d7b;
+}
+
+.map-secondary-button:hover {
+    background: #dcecfb;
+    color: #123d70;
+}
+
+/* Map */
+
+#detailMap {
+    width: 100%;
+    height: 530px;
+    background: #e8eef2;
+    z-index: 1;
+}
+
+.map-status {
+    padding: 10px 16px;
+    color: #52657a;
+    background: #f8fafc;
+    font-size: 13px;
+    min-height: 38px;
+}
+
+.map-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    padding: 16px;
+}
+
+.map-button {
+    display: inline-block;
+    background: #0b55a0;
+    color: white;
+    padding: 12px 18px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.map-button:hover {
+    background: #083e78;
+    color: white;
+}
+
+.no-map {
+    background: #eff6ff;
+    color: #31577e;
+    padding: 22px;
+    border-radius: 10px;
+    margin: 15px;
+}
+
+.route-info {
+    display: none;
+    padding: 14px 18px;
+    background: #eff6ff;
+    color: #174d7b;
+    border-top: 1px solid #dbeafe;
+    font-weight: 600;
+}
+
+.leaflet-popup-content {
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+@media(max-width: 600px) {
+    .location-header {
+        padding: 24px 18px;
+    }
+
+    .location-header h1 {
+        font-size: 24px;
+    }
+
+    #detailMap {
+        height: 400px;
+    }
+
+    .map-search-area {
+        padding: 10px;
+    }
+
+    .map-search-area input {
+        flex-basis: 100%;
+    }
+
+    .map-action-button {
+        flex: 1;
+    }
+}
+</style>
+{% endblock %}
+
+
+{% block content %}
+
+<div class="location-details-page">
+
+    <a class="back-link"
+       href="{{ url_for('locations.location_list') }}">
+        ← Back to Locations
+    </a>
+
+    <section class="location-header">
+        <h1>📍 {{ location.location_name }}</h1>
+        <p>{{ location.district or 'District not specified' }}</p>
+        <p>Explore location information and map details.</p>
+    </section>
+
+    <h2>Location Information</h2>
+
+    <div class="details-grid">
+
+        <div class="detail-card">
+            <div class="icon">📍</div>
+            <h3>Location Name</h3>
+            <p>{{ location.location_name }}</p>
+        </div>
+
+        <div class="detail-card">
+            <div class="icon">🏙️</div>
+            <h3>District</h3>
+            <p>{{ location.district or 'Not specified' }}</p>
+        </div>
+
+        <div class="detail-card">
+            <div class="icon">🏠</div>
+            <h3>Full Address</h3>
+            <p>{{ location.address or 'Address not available' }}</p>
+        </div>
+
+        <div class="detail-card">
+            <div class="icon">☎️</div>
+            <h3>Contact Number</h3>
+
+            {% if location.phone %}
+            <p>
+                <a href="tel:{{ location.phone }}">
+                    {{ location.phone }}
+                </a>
+            </p>
+            {% else %}
+            <p>Not available</p>
+            {% endif %}
+        </div>
+
+        <div class="detail-card">
+            <div class="icon">🌐</div>
+            <h3>Latitude</h3>
+            <p>{{ location.latitude if location.latitude is not none else 'Not available' }}</p>
+        </div>
+
+        <div class="detail-card">
+            <div class="icon">🌐</div>
+            <h3>Longitude</h3>
+            <p>{{ location.longitude if location.longitude is not none else 'Not available' }}</p>
+        </div>
+
+    </div>
+
+
+    <!-- GOOGLE MAPS STYLE MAP -->
+
+    <section class="map-card">
+
+        <div class="map-heading">
+            <h2>Explore on Map</h2>
+            <p>Search places, explore the area and get directions.</p>
+        </div>
+
+        {% if location.latitude is not none and location.longitude is not none %}
+
+        <div class="map-search-area">
+
+            <input
+                type="text"
+                id="placeSearch"
+                placeholder="Search a place or address..."
+                aria-label="Search places">
+
+            <button class="map-action-button"
+                    onclick="searchPlace()">
+                Search
+            </button>
+
+            <button class="map-action-button map-secondary-button"
+                    onclick="findMyLocation()"
+                    title="Show my location">
+                My Location
+            </button>
+
+        </div>
+
+        <div id="detailMap"
+             data-latitude="{{ location.latitude }}"
+             data-longitude="{{ location.longitude }}"
+             data-name="{{ location.location_name | e }}"
+             data-address="{{ location.address or '' | e }}">
+        </div>
+
+        <div class="map-status" id="mapStatus">
+            Map ready. Search for a place or explore the map.
+        </div>
+
+        <div class="route-info" id="routeInfo"></div>
+
+        <div class="map-actions">
+
+            <button class="map-action-button"
+                    onclick="showRoute()">
+                Get Directions
+            </button>
+
+            <button class="map-action-button map-secondary-button"
+                    onclick="clearRoute()">
+                Clear Route
+            </button>
+
+            <a class="map-button"
+               href="https://www.google.com/maps/dir/?api=1&destination={{ location.latitude }},{{ location.longitude }}"
+               target="_blank"
+               rel="noopener noreferrer">
+                Open in Google Maps ↗
+            </a>
+
+        </div>
+
+        {% else %}
+
+        <div class="no-map">
+            Map coordinates are not available for this location.
+            Please contact the administrator to update them.
+        </div>
+
+        {% endif %}
+
+    </section>
+
+</div>
+
+{% endblock %}
+
+
+{% block extra_js %}
+
+{% if location.latitude is not none and location.longitude is not none %}
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const mapElement = document.getElementById("detailMap");
+
+    const latitude = Number(mapElement.dataset.latitude);
+    const longitude = Number(mapElement.dataset.longitude);
+    const locationName = mapElement.dataset.name;
+    const locationAddress = mapElement.dataset.address;
+
+    const statusElement = document.getElementById("mapStatus");
+    const routeInfoElement = document.getElementById("routeInfo");
+
+    // Initialize map
+
+    const map = L.map("detailMap", {
+        zoomControl: false
+    }).setView([latitude, longitude], 15);
+
+    // Normal street map
+
+    const streetLayer = L.tileLayer(
+        "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+        {
+            maxZoom: 19,
+            attribution: "&copy; OpenStreetMap contributors"
+        }
+    );
+
+    // Satellite-style imagery layer.
+    // Availability and coverage depend on Esri's public imagery service.
+
+    const satelliteLayer = L.tileLayer(
+        "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+        {
+            maxZoom: 19,
+            attribution: "Tiles &copy; Esri"
+        }
+    );
+
+    streetLayer.addTo(map);
+
+    // Layer selector
+
+    L.control.layers(
+        {
+            "Street Map": streetLayer,
+            "Satellite": satelliteLayer
+        },
+        {},
+        {
+            position: "topright"
+        }
+    ).addTo(map);
+
+    // Zoom control
+
+    L.control.zoom({
+        position: "bottomright"
+    }).addTo(map);
+
+    // Scale
+
+    L.control.scale({
+        position: "bottomleft",
+        metric: true,
+        imperial: false
+    }).addTo(map);
+
+    // Fullscreen control
+
+    const fullscreenControl = L.control({ position: "topleft" });
+
+    fullscreenControl.onAdd = function () {
+        const button = L.DomUtil.create("button", "map-action-button");
+        button.type = "button";
+        button.innerHTML = "⛶";
+        button.title = "Toggle fullscreen";
+        button.style.fontSize = "20px";
+        button.style.padding = "7px 13px";
+
+        L.DomEvent.disableClickPropagation(button);
+
+        button.onclick = function () {
+            const mapContainer = mapElement;
+
+            if (!document.fullscreenElement) {
+                if (mapContainer.requestFullscreen) {
+                    mapContainer.requestFullscreen();
+                }
+            } else {
+                document.exitFullscreen();
+            }
+
+            setTimeout(() => map.invalidateSize(), 300);
+        };
+
+        return button;
+    };
+
+    fullscreenControl.addTo(map);
+
+    // Main location marker
+
+    const mainMarker = L.marker([latitude, longitude])
+        .addTo(map)
+        .bindPopup(
+            "<strong>" + escapeHTML(locationName) + "</strong><br>" +
+            escapeHTML(locationAddress)
+        )
+        .openPopup();
+
+    let destinationMarker = null;
+    let routeLayer = null;
+    let myLocationMarker = null;
+
+    // Prevent HTML injection in popup content
+
+    function escapeHTML(value) {
+        return String(value || "").replace(/[&<>"']/g, function (char) {
+            return {
+                "&": "&amp;",
+                "<": "&lt;",
+                ">": "&gt;",
+                '"': "&quot;",
+                "'": "&#039;"
+            }[char];
+        });
+    }
+
+    // Search places using OpenStreetMap Nominatim
+
+    window.searchPlace = async function () {
+
+        const query = document.getElementById("placeSearch").value.trim();
+
+        if (!query) {
+            statusElement.textContent = "Please enter a place to search.";
+            return;
+        }
+
+        statusElement.textContent = "Searching for " + query + "...";
+
+        try {
+
+            const url =
+                "https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&q=" +
+                encodeURIComponent(query);
+
+            const response = await fetch(url);
+
+            if (!response.ok) {
+                throw new Error("Search service unavailable");
+            }
+
+            const results = await response.json();
+
+            if (!results.length) {
+                statusElement.textContent = "No places found. Try another search.";
+                return;
+            }
+
+            const place = results[0];
+
+            const lat = Number(place.lat);
+            const lon = Number(place.lon);
+
+            map.setView([lat, lon], 16);
+
+            if (destinationMarker) {
+                map.removeLayer(destinationMarker);
+            }
+
+            destinationMarker = L.marker([lat, lon])
+                .addTo(map)
+                .bindPopup("<strong>" + escapeHTML(place.display_name) + "</strong>")
+                .openPopup();
+
+            statusElement.textContent = "Place found: " + place.display_name;
+
+        } catch (error) {
+
+            statusElement.textContent =
+                "Unable to search right now. Please try again.";
+
+            console.error(error);
+        }
+    };
+
+    // Search when Enter is pressed
+
+    document.getElementById("placeSearch").addEventListener(
+        "keydown",
+        function (event) {
+            if (event.key === "Enter") {
+                searchPlace();
+            }
+        }
+    );
+
+    // Current location
+
+    window.findMyLocation = function () {
+
+        if (!navigator.geolocation) {
+            statusElement.textContent =
+                "Your browser does not support location services.";
+            return;
+        }
+
+        statusElement.textContent = "Finding your current location...";
+
+        navigator.geolocation.getCurrentPosition(
+            function (position) {
+
+                const lat = position.coords.latitude;
+                const lon = position.coords.longitude;
+
+                map.setView([lat, lon], 16);
+
+                if (myLocationMarker) {
+                    map.removeLayer(myLocationMarker);
+                }
+
+                myLocationMarker = L.circleMarker([lat, lon], {
+                    radius: 9,
+                    color: "#ffffff",
+                    weight: 3,
+                    fillColor: "#2878e5",
+                    fillOpacity: 1
+                }).addTo(map).bindPopup("Your current location");
+
+                myLocationMarker.openPopup();
+
+                statusElement.textContent = "Your current location is displayed.";
+
+            },
+            function (error) {
+
+                statusElement.textContent =
+                    "Unable to access your location. Please allow location permission.";
+
+            },
+            {
+                enableHighAccuracy: true,
+                timeout: 10000
+            }
+        );
+    };
+
+    // Directions: current location to selected location
+
+    window.showRoute = function () {
+
+        if (!navigator.geolocation) {
+            statusElement.textContent =
+                "Location services are not supported by your browser.";
+            return;
+        }
+
+        statusElement.textContent = "Finding your location to calculate route...";
+
+        navigator.geolocation.getCurrentPosition(
+            async function (position) {
+
+                const startLat = position.coords.latitude;
+                const startLon = position.coords.longitude;
+
+                const routeUrl =
+                    "https://router.project-osrm.org/route/v1/driving/" +
+                    startLon + "," + startLat + ";" +
+                    longitude + "," + latitude +
+                    "?overview=full&geometries=geojson";
+
+                try {
+
+                    const response = await fetch(routeUrl);
+
+                    if (!response.ok) {
+                        throw new Error("Routing service unavailable");
+                    }
+
+                    const data = await response.json();
+
+                    if (!data.routes || !data.routes.length) {
+                        throw new Error("No route found");
+                    }
+
+                    const route = data.routes[0];
+
+                    if (routeLayer) {
+                        map.removeLayer(routeLayer);
+                    }
+
+                    const coordinates = route.geometry.coordinates.map(
+                        point => [point[1], point[0]]
+                    );
+
+                    routeLayer = L.polyline(coordinates, {
+                        color: "#1769e0",
+                        weight: 6,
+                        opacity: 0.85
+                    }).addTo(map);
+
+                    map.fitBounds(routeLayer.getBounds(), {
+                        padding: [40, 40]
+                    });
+
+                    const distanceKm = (route.distance / 1000).toFixed(2);
+                    const durationMin = Math.round(route.duration / 60);
+
+                    routeInfoElement.style.display = "block";
+                    routeInfoElement.textContent =
+                        "Driving distance: " + distanceKm +
+                        " km | Estimated time: " + durationMin + " minutes";
+
+                    statusElement.textContent =
+                        "Route displayed from your current location to " +
+                        locationName + ".";
+
+                } catch (error) {
+
+                    statusElement.textContent =
+                        "Could not calculate the route. Please try again or use Google Maps.";
+
+                    console.error(error);
+                }
+
+            },
+            function () {
+                statusElement.textContent =
+                    "Please allow location access to calculate directions.";
+            },
+            {
+                enableHighAccuracy: true,
+                timeout: 10000
+            }
+        );
+    };
+
+    // Clear route
+
+    window.clearRoute = function () {
+
+        if (routeLayer) {
+            map.removeLayer(routeLayer);
+            routeLayer = null;
+        }
+
+        routeInfoElement.style.display = "none";
+        routeInfoElement.textContent = "";
+
+        map.setView([latitude, longitude], 15);
+        mainMarker.openPopup();
+
+        statusElement.textContent = "Route cleared.";
+
+    };
+
+    // Correct map display after page layout
+
+    setTimeout(function () {
+        map.invalidateSize();
+    }, 300);
+
+});
+</script>
+
+{% endif %}
+
+{% endblock %}

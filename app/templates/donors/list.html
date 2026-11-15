@@ -1,0 +1,88 @@
+
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container" style="max-width:1000px; margin:40px auto;">
+
+    <h1>Blood Donor Directory</h1>
+    <p>Find available blood donors in your area.</p>
+
+    <a href="{{ url_for('donors.register_donor') }}">
+        + Register as a Blood Donor
+    </a>
+
+    <form method="GET"
+          action="{{ url_for('donors.donor_list') }}"
+          style="margin:25px 0;">
+
+        <label for="blood_group">Blood Group</label>
+
+        <select name="blood_group" id="blood_group"
+                style="padding:10px; margin:10px;">
+            <option value="">All Blood Groups</option>
+
+            {% for group in ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'] %}
+                <option value="{{ group }}"
+                    {% if selected_group == group %}selected{% endif %}>
+                    {{ group }}
+                </option>
+            {% endfor %}
+        </select>
+
+        <label for="location">Location</label>
+
+        <input type="text"
+               name="location"
+               id="location"
+               value="{{ search_location }}"
+               placeholder="Enter area or village"
+               style="padding:10px; margin:10px;">
+
+        <button type="submit" style="padding:10px 20px;">
+            Search Donors
+        </button>
+
+    </form>
+
+    <hr>
+
+    {% if donors %}
+
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(230px, 1fr)); gap:20px;">
+
+            {% for donor in donors %}
+
+                <div style="border:1px solid #ddd; padding:20px; border-radius:10px;">
+
+                    <h3>{{ donor.donor_name }}</h3>
+
+                    <p>
+                        <strong>Blood Group:</strong>
+                        {{ donor.blood_group }}
+                    </p>
+
+                    <p>
+                        <strong>Location:</strong>
+                        {{ donor.location }}
+                    </p>
+
+                    <p style="color:green;">
+                        Available Donor
+                    </p>
+
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+    {% else %}
+
+        <p>No donors found. Try another blood group or location.</p>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

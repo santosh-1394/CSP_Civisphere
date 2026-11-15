@@ -1,0 +1,102 @@
+
+{% extends "base.html" %}
+
+{% block title %}{{ service.service_name }} | CiviSphere{% endblock %}
+
+{% block content %}
+
+<style>
+    .details-container {
+        max-width: 850px;
+        margin: 50px auto;
+        padding: 20px;
+    }
+
+    .details-card {
+        background: white;
+        padding: 35px;
+        border-radius: 16px;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+    }
+
+    .details-icon {
+        font-size: 45px;
+        margin-bottom: 20px;
+    }
+
+    .details-card h1 {
+        color: #172554;
+        margin-bottom: 15px;
+    }
+
+    .details-description {
+        color: #64748b;
+        font-size: 16px;
+        line-height: 1.8;
+        margin: 20px 0;
+    }
+
+    .category-label {
+        display: inline-block;
+        padding: 7px 15px;
+        background: #eff6ff;
+        color: #1d4ed8;
+        border-radius: 20px;
+        font-size: 13px;
+    }
+
+    .details-info {
+        margin-top: 25px;
+        padding: 18px;
+        background: #f8fafc;
+        border-radius: 10px;
+    }
+
+    .back-link {
+        display: inline-block;
+        margin-top: 25px;
+        color: #2563eb;
+        text-decoration: none;
+        font-weight: bold;
+    }
+
+    .back-link:hover {
+        text-decoration: underline;
+    }
+</style>
+
+<div class="details-container">
+
+    <div class="details-card">
+
+        <div class="details-icon">🏛️</div>
+
+        <h1>{{ service.service_name }}</h1>
+
+        <span class="category-label">
+            {{ service.category }}
+        </span>
+
+        <p class="details-description">
+            {{ service.description }}
+        </p>
+
+        <div class="details-info">
+            <h3>About this service</h3>
+            <p>
+                This service is listed on CiviSphere to help citizens
+                access useful public service information.
+            </p>
+        </div>
+
+        <a href="{{ url_for('services.list_services') }}"
+           class="back-link">
+            ← Back to Citizen Services
+        </a>
+
+    </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,414 @@
+
+{% extends "base.html" %}
+
+{% block title %}Community Locations | CiviSphere{% endblock %}
+
+{% block extra_css %}
+<style>
+.location-page {
+    max-width: 1200px;
+    margin: 35px auto;
+    padding: 20px;
+}
+
+.location-header {
+    margin-bottom: 25px;
+}
+
+.location-header h1 {
+    color: var(--text-color);
+    font-size: 30px;
+    margin-bottom: 10px;
+}
+
+.location-header p {
+    color: var(--muted-text);
+    line-height: 1.6;
+}
+
+.location-search-box {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 14px;
+    padding: 22px;
+    margin-bottom: 30px;
+    box-shadow: var(--shadow);
+}
+
+.location-search-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.location-search-form input,
+.location-search-form select {
+    flex: 1;
+    min-width: 200px;
+    padding: 13px 15px;
+    border: 1px solid var(--border-color);
+    border-radius: 9px;
+    background: var(--input-bg);
+    color: var(--text-color);
+    font-size: 15px;
+}
+
+.location-search-form input:focus,
+.location-search-form select:focus {
+    outline: none;
+    border-color: #2563eb;
+}
+
+.search-button,
+.clear-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 22px;
+    border: none;
+    border-radius: 9px;
+    background: #2563eb;
+    color: white;
+    text-decoration: none;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.search-button:hover {
+    background: #1d4ed8;
+    color: white;
+}
+
+.clear-button {
+    background: var(--input-bg);
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+}
+
+.clear-button:hover {
+    background: var(--border-color);
+    color: var(--text-color);
+}
+
+.results-heading {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.results-heading h2 {
+    color: var(--text-color);
+    font-size: 23px;
+}
+
+.result-count {
+    color: var(--muted-text);
+    font-size: 14px;
+}
+
+.location-grid {
+    display: grid;
+    grid-template-columns: repeat(
+        auto-fit,
+        minmax(260px, 1fr)
+    );
+    gap: 20px;
+}
+
+.location-card {
+    padding: 23px;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 13px;
+    box-shadow: var(--shadow);
+    transition: transform 0.2s ease;
+    overflow-wrap: anywhere;
+}
+
+.location-card:hover {
+    transform: translateY(-3px);
+}
+
+.location-badge {
+    display: inline-block;
+    padding: 6px 11px;
+    border-radius: 20px;
+    background: #dbeafe;
+    color: #1d4ed8;
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 12px;
+}
+
+.location-card h3 {
+    color: var(--text-color);
+    font-size: 20px;
+    margin-bottom: 15px;
+}
+
+.location-detail {
+    display: flex;
+    gap: 9px;
+    margin: 11px 0;
+    color: var(--muted-text);
+    line-height: 1.5;
+    font-size: 14px;
+}
+
+.location-detail strong {
+    color: var(--text-color);
+    min-width: 75px;
+}
+
+.location-details-link {
+    display: inline-block;
+    margin-top: 14px;
+    padding: 10px 17px;
+    border-radius: 8px;
+    background: #2563eb;
+    color: white;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.location-details-link:hover {
+    background: #1d4ed8;
+    color: white;
+}
+
+.empty-state {
+    padding: 40px 20px;
+    text-align: center;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+}
+
+.empty-state h3 {
+    color: var(--text-color);
+    margin-bottom: 10px;
+}
+
+.empty-state p {
+    color: var(--muted-text);
+    line-height: 1.6;
+}
+
+html[data-theme="dark"] .location-badge {
+    background: #262626;
+    color: #93c5fd;
+}
+
+@media (max-width: 600px) {
+    .location-page {
+        padding: 15px;
+        margin: 15px auto;
+    }
+
+    .location-header h1 {
+        font-size: 24px;
+    }
+
+    .location-search-form {
+        flex-direction: column;
+    }
+
+    .location-search-form input,
+    .location-search-form select,
+    .search-button,
+    .clear-button {
+        width: 100%;
+    }
+}
+</style>
+{% endblock %}
+
+
+{% block content %}
+
+<section class="location-page">
+
+    <header class="location-header">
+        <h1>Community Locations</h1>
+
+        <p>
+            Search and explore community locations registered
+            in CiviSphere. View their addresses, districts,
+            contact numbers and available location information.
+        </p>
+    </header>
+
+
+    <!-- LOCATION SEARCH -->
+
+    <section class="location-search-box">
+
+        <form
+            class="location-search-form"
+            method="GET"
+            action="{{ url_for('locations.location_list') }}"
+        >
+
+            <input
+                type="text"
+                name="search"
+                placeholder="Search location name, address or district..."
+                value="{{ search }}"
+            >
+
+            <select name="district">
+
+                <option value="">All Districts</option>
+
+                {% for item in districts %}
+
+                    <option
+                        value="{{ item.district }}"
+                        {% if selected_district == item.district %}
+                            selected
+                        {% endif %}
+                    >
+                        {{ item.district }}
+                    </option>
+
+                {% endfor %}
+
+            </select>
+
+            <button type="submit" class="search-button">
+                Search
+            </button>
+
+            <a
+                href="{{ url_for('locations.location_list') }}"
+                class="clear-button"
+            >
+                Clear
+            </a>
+
+        </form>
+
+    </section>
+
+
+    <!-- SEARCH RESULTS -->
+
+    <section class="location-results">
+
+        <div class="results-heading">
+
+            <h2>
+                {% if search %}
+                    Search Results
+                {% elif selected_district %}
+                    {{ selected_district }} Locations
+                {% else %}
+                    Registered Locations
+                {% endif %}
+            </h2>
+
+            <span class="result-count">
+                {{ locations|length }} location(s) found
+            </span>
+
+        </div>
+
+
+        {% if locations %}
+
+            <div class="location-grid">
+
+                {% for location in locations %}
+
+                    <article class="location-card">
+
+                        <span class="location-badge">
+                            CiviSphere Registered
+                        </span>
+
+                        <h3>
+                            {{ location.location_name }}
+                        </h3>
+
+                        <div class="location-detail">
+                            <strong>District:</strong>
+                            <span>
+                                {{ location.district or 'Not available' }}
+                            </span>
+                        </div>
+
+                        <div class="location-detail">
+                            <strong>Address:</strong>
+                            <span>
+                                {{ location.address or 'Not available' }}
+                            </span>
+                        </div>
+
+                        <div class="location-detail">
+                            <strong>Phone:</strong>
+                            <span>
+                                {{ location.phone or 'Not available' }}
+                            </span>
+                        </div>
+
+                        {% if location.latitude is not none %}
+                            <div class="location-detail">
+                                <strong>Latitude:</strong>
+                                <span>{{ location.latitude }}</span>
+                            </div>
+                        {% endif %}
+
+                        {% if location.longitude is not none %}
+                            <div class="location-detail">
+                                <strong>Longitude:</strong>
+                                <span>{{ location.longitude }}</span>
+                            </div>
+                        {% endif %}
+
+                        <a
+                            class="location-details-link"
+                            href="{{ url_for(
+                                'locations.location_details',
+                                location_id=location.location_id
+                            ) }}"
+                        >
+                            View Full Details
+                        </a>
+
+                    </article>
+
+                {% endfor %}
+
+            </div>
+
+        {% else %}
+
+            <div class="empty-state">
+
+                <h3>No Registered Locations Found</h3>
+
+                <p>
+                    {% if search %}
+                        No registered locations match
+                        "{{ search }}". Try another search or
+                        ask an administrator to add this location.
+                    {% elif selected_district %}
+                        No active locations are registered
+                        for {{ selected_district }}.
+                    {% else %}
+                        No community locations have been registered yet.
+                    {% endif %}
+                </p>
+
+            </div>
+
+        {% endif %}
+
+    </section>
+
+</section>
+
+{% endblock %}

@@ -1,0 +1,399 @@
+
+{% extends "base.html" %}
+
+{% block title %}Emergency Services Search | CiviSphere{% endblock %}
+
+{% block extra_css %}
+
+<style>
+    .search-results-container {
+        max-width: 1150px;
+        margin: 30px auto;
+        padding: 20px;
+        color: var(--text-color);
+    }
+
+    /* HEADER */
+
+    .results-header {
+        background: linear-gradient(135deg, #1e3a8a, #2563eb);
+        color: #ffffff;
+        padding: 30px;
+        border-radius: 15px;
+        margin-bottom: 25px;
+    }
+
+    .results-header h1 {
+        margin-bottom: 8px;
+        color: #ffffff;
+    }
+
+    .results-header p {
+        color: #dbeafe;
+    }
+
+    /* RESULTS COUNT */
+
+    .results-count {
+        margin: 20px 0;
+        color: var(--muted-text);
+    }
+
+    .results-count strong {
+        color: var(--text-color);
+    }
+
+    /* GRID */
+
+    .results-grid {
+        display: grid;
+        grid-template-columns: repeat(
+            auto-fit,
+            minmax(270px, 1fr)
+        );
+        gap: 20px;
+    }
+
+    /* FACILITY CARD */
+
+    .result-card {
+        background: var(--card-bg);
+        padding: 22px;
+        border: 1px solid var(--border-color);
+        border-radius: 13px;
+        box-shadow: var(--shadow);
+        color: var(--text-color);
+        transition: transform 0.2s ease,
+                    box-shadow 0.2s ease;
+        overflow-wrap: anywhere;
+    }
+
+    .result-card:hover {
+        transform: translateY(-3px);
+    }
+
+    .result-card h3 {
+        color: var(--text-color);
+        margin: 12px 0;
+        font-size: 20px;
+    }
+
+    .result-card p {
+        color: var(--muted-text);
+        font-size: 14px;
+        margin: 9px 0;
+        line-height: 1.6;
+    }
+
+    .result-card strong {
+        color: var(--text-color);
+    }
+
+    /* CATEGORY */
+
+    .category-label {
+        display: inline-block;
+        background: #dbeafe;
+        color: #1d4ed8;
+        padding: 6px 11px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        margin-bottom: 8px;
+    }
+
+    /* VERIFICATION */
+
+    .verified {
+        color: #15803d !important;
+        font-weight: 700;
+    }
+
+    .unverified {
+        color: #d97706 !important;
+        font-weight: 700;
+    }
+
+    /* DETAILS BUTTON */
+
+    .details-link {
+        display: inline-block;
+        margin-top: 12px;
+        padding: 10px 16px;
+        background: #1d4ed8;
+        color: #ffffff !important;
+        text-decoration: none;
+        border-radius: 7px;
+        font-size: 13px;
+        font-weight: 600;
+        transition: background 0.2s ease;
+    }
+
+    .details-link:hover {
+        background: #1e40af;
+        text-decoration: none;
+    }
+
+    /* NO RESULTS */
+
+    .no-results {
+        background: var(--card-bg);
+        color: var(--text-color);
+        padding: 35px;
+        text-align: center;
+        border-radius: 13px;
+        border: 1px solid var(--border-color);
+        box-shadow: var(--shadow);
+    }
+
+    .no-results h2 {
+        color: var(--text-color);
+        margin-bottom: 12px;
+    }
+
+    .no-results p {
+        color: var(--muted-text);
+        margin: 8px 0;
+        line-height: 1.6;
+    }
+
+    /* BACK LINK */
+
+    .back-link {
+        display: inline-block;
+        margin-top: 25px;
+        color: #2563eb;
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+    .back-link:hover {
+        text-decoration: underline;
+    }
+
+    /* DARK MODE */
+
+    html[data-theme="dark"] .result-card {
+        background: #171717;
+        border-color: #303030;
+        color: #ffffff;
+    }
+
+    html[data-theme="dark"] .result-card h3,
+    html[data-theme="dark"] .result-card strong {
+        color: #ffffff;
+    }
+
+    html[data-theme="dark"] .result-card p {
+        color: #b3b3b3;
+    }
+
+    html[data-theme="dark"] .category-label {
+        background: #262626;
+        color: #93c5fd;
+    }
+
+    html[data-theme="dark"] .no-results {
+        background: #171717;
+        border-color: #303030;
+        color: #ffffff;
+    }
+
+    html[data-theme="dark"] .no-results h2 {
+        color: #ffffff;
+    }
+
+    html[data-theme="dark"] .no-results p {
+        color: #b3b3b3;
+    }
+
+    html[data-theme="dark"] .results-count {
+        color: #b3b3b3;
+    }
+
+    html[data-theme="dark"] .results-count strong {
+        color: #ffffff;
+    }
+
+    html[data-theme="dark"] .verified {
+        color: #4ade80 !important;
+    }
+
+    html[data-theme="dark"] .unverified {
+        color: #fbbf24 !important;
+    }
+
+    html[data-theme="dark"] .back-link {
+        color: #60a5fa;
+    }
+
+    /* MOBILE */
+
+    @media (max-width: 600px) {
+        .search-results-container {
+            padding: 12px;
+        }
+
+        .results-header {
+            padding: 23px;
+        }
+
+        .results-header h1 {
+            font-size: 25px;
+        }
+
+        .results-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .result-card {
+            padding: 18px;
+        }
+    }
+</style>
+
+{% endblock %}
+
+
+{% block content %}
+
+<div class="search-results-container">
+
+    <!-- HEADER -->
+
+    <section class="results-header">
+
+        <h1>Emergency Services Results</h1>
+
+        <p>
+            Showing emergency facilities matching:
+            <strong>{{ location }}</strong>
+        </p>
+
+    </section>
+
+
+    <!-- RESULTS COUNT -->
+
+    <div class="results-count">
+
+        <strong>{{ services|length }}</strong>
+        emergency service(s) found.
+
+    </div>
+
+
+    {% if services %}
+
+        <!-- FACILITY GRID -->
+
+        <div class="results-grid">
+
+            {% for service in services %}
+
+                <article class="result-card">
+
+                    <span class="category-label">
+                        {{ service.category }}
+                    </span>
+
+                    <h3>
+                        {{ service.service_name }}
+                    </h3>
+
+                    {% if service.subcategory %}
+
+                        <p>
+                            <strong>Type:</strong>
+                            {{ service.subcategory }}
+                        </p>
+
+                    {% endif %}
+
+                    <p>
+                        <strong>Location:</strong>
+
+                        {{ service.city or '' }}
+
+                        {% if service.district %}
+                            , {{ service.district }}
+                        {% endif %}
+
+                        , {{ service.state }}
+                    </p>
+
+                    <p>
+                        <strong>Address:</strong>
+                        {{ service.address }}
+                    </p>
+
+                    {% if service.phone %}
+
+                        <p>
+                            <strong>Phone:</strong>
+                            {{ service.phone }}
+                        </p>
+
+                    {% endif %}
+
+                    {% if service.is_verified %}
+
+                        <p class="verified">
+                            ✓ Verified Facility
+                        </p>
+
+                    {% else %}
+
+                        <p class="unverified">
+                            ⚠ Not yet verified
+                        </p>
+
+                    {% endif %}
+
+                    <a
+                        class="details-link"
+                        href="{{ url_for(
+                            'emergency_services.service_details',
+                            service_id=service.service_id
+                        ) }}"
+                    >
+                        View Details →
+                    </a>
+
+                </article>
+
+            {% endfor %}
+
+        </div>
+
+    {% else %}
+
+        <!-- EMPTY RESULTS -->
+
+        <div class="no-results">
+
+            <h2>No Emergency Services Found</h2>
+
+            <p>
+                We could not find any active emergency facilities
+                matching "{{ location }}".
+            </p>
+
+            <p>
+                Try searching with another city, district or state.
+            </p>
+
+        </div>
+
+    {% endif %}
+
+
+    <!-- BACK HOME -->
+
+    <a href="{{ url_for('home') }}" class="back-link">
+        ← Back to Home
+    </a>
+
+</div>
+
+{% endblock %}

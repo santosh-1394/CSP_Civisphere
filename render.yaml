@@ -1,0 +1,29 @@
+# =============================================
+# CiviSphere - Render Blueprint
+# =============================================
+# Deploy with: https://render.com/deploy
+# =============================================
+
+services:
+  - type: web
+    name: civisphere
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn index:app --bind 0.0.0.0:$PORT --workers 2 --threads 2 --timeout 120
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: MYSQL_HOST
+        sync: false
+      - key: MYSQL_PORT
+        value: "4000"
+      - key: MYSQL_USER
+        sync: false
+      - key: MYSQL_PASSWORD
+        sync: false
+      - key: MYSQL_DATABASE
+        value: civisphere_db
+      - key: MYSQL_SSL_CA
+        value: certs/ca.pem
+      - key: PYTHON_VERSION
+        value: "3.12"

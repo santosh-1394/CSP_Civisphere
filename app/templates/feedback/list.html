@@ -1,0 +1,74 @@
+
+{% extends "base.html" %}
+
+{% block content %}
+<div class="page-container">
+
+    <div class="page-header">
+        <div>
+            <h1>Share Your Feedback</h1>
+            <p>Help us improve CiviSphere services.</p>
+        </div>
+    </div>
+
+    <div class="form-container">
+        <h2>Submit Feedback</h2>
+
+        <form method="POST" action="{{ url_for('feedback.feedback_list') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+            <div class="form-group">
+                <label>Rate Your Experience</label>
+
+                <div class="rating-options">
+                    {% for number in range(1, 6) %}
+                        <label>
+                            <input type="radio" name="rating"
+                                   value="{{ number }}" required>
+                            {{ number }} ⭐
+                        </label>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="message">Your Comments (Optional)</label>
+                <textarea
+                    id="message"
+                    name="message"
+                    rows="5"
+                    placeholder="Write your suggestions or experience..."
+                ></textarea>
+            </div>
+
+            <button type="submit" class="btn-primary">
+                Submit Feedback
+            </button>
+        </form>
+    </div>
+
+    <div class="feedback-history">
+        <h2>Your Previous Feedback</h2>
+
+        {% if feedbacks %}
+            {% for item in feedbacks %}
+                <div class="feedback-card">
+                    <h3>{{ item.rating }} / 5 ⭐</h3>
+
+                    <p>
+                        {{ item.message or "No comments provided." }}
+                    </p>
+
+                    <small>{{ item.created_at }}</small>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty-state">
+                <h3>No feedback submitted yet</h3>
+                <p>Your submitted feedback will appear here.</p>
+            </div>
+        {% endif %}
+    </div>
+
+</div>
+{% endblock %}

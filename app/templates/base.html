@@ -1,0 +1,218 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>{% block title %}CiviSphere{% endblock %}</title>
+
+    <!-- Google Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+          rel="stylesheet">
+
+    <!-- Apply saved theme before page rendering -->
+    <script>
+        (function () {
+            try {
+                const savedTheme = localStorage.getItem("civisphere-theme") || "light";
+
+                document.documentElement.setAttribute(
+                    "data-theme",
+                    savedTheme === "dark" ? "dark" : "light"
+                );
+            } catch (error) {
+                document.documentElement.setAttribute("data-theme", "light");
+            }
+        })();
+    </script>
+
+    <!-- Global CSS -->
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+    {% block extra_css %}{% endblock %}
+</head>
+
+<body>
+
+    <!-- NAVIGATION BAR -->
+    <header class="navbar">
+
+        <a href="{{ url_for('home') }}" class="logo">
+            <span class="logo-icon">📍</span>
+
+            <span>
+                CiviSphere
+                <small>YOUR COMMUNITY. YOUR SERVICES.</small>
+            </span>
+        </a>
+
+        <nav class="nav-links">
+
+            <a href="{{ url_for('home') }}">
+                Home
+            </a>
+
+            <a href="{{ url_for('emergency_services.emergency_services_home') }}">
+                Emergency Services
+            </a>
+
+            {% if current_user.is_authenticated %}
+
+                {% if current_user.role|lower == 'admin' %}
+
+                    <a href="{{ url_for('admin.admin_dashboard') }}"
+                       class="admin-btn">
+                        Admin Dashboard
+                    </a>
+
+                    <a href="{{ url_for('emergency_services.admin_list') }}"
+                       class="admin-btn">
+                        Manage Emergency Services
+                    </a>
+
+                {% endif %}
+
+                <a href="{{ url_for('auth.logout') }}"
+                   class="logout-btn">
+                    Logout
+                </a>
+
+            {% else %}
+
+                <a href="{{ url_for('auth.login') }}">
+                    Login
+                </a>
+
+                <a href="{{ url_for('auth.register') }}">
+                    Register
+                </a>
+
+            {% endif %}
+
+            <!-- LIGHT / DARK MODE BUTTON -->
+            <button type="button"
+                    id="themeToggle"
+                    class="theme-toggle"
+                    aria-label="Switch theme">
+                🌙 Dark Mode
+            </button>
+
+        </nav>
+
+    </header>
+
+    <!-- FLASH MESSAGES -->
+    <div class="flash-messages">
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+
+            {% for category, message in messages %}
+
+                <div class="flash {{ category }}">
+                    {{ message }}
+                </div>
+
+            {% endfor %}
+
+        {% endwith %}
+
+    </div>
+
+    <!-- MAIN PAGE CONTENT -->
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+
+        <strong>CiviSphere</strong> –
+        An Integrated Citizen Services and Community Support Portal
+
+        <br>
+
+        Your Community. Your Services. One Platform.
+
+        <br>
+
+        © 2026 CiviSphere. All rights reserved.
+
+    </footer>
+
+    <!-- THEME SWITCHING SCRIPT -->
+    <script>
+        (function () {
+
+            const themeToggle = document.getElementById("themeToggle");
+
+            function applyTheme(theme) {
+
+                const selectedTheme = theme === "dark" ? "dark" : "light";
+
+                document.documentElement.setAttribute(
+                    "data-theme",
+                    selectedTheme
+                );
+
+                if (themeToggle) {
+                    themeToggle.textContent =
+                        selectedTheme === "dark"
+                            ? "☀️ Light Mode"
+                            : "🌙 Dark Mode";
+
+                    themeToggle.setAttribute(
+                        "aria-label",
+                        selectedTheme === "dark"
+                            ? "Switch to light mode"
+                            : "Switch to dark mode"
+                    );
+                }
+            }
+
+            let savedTheme = "light";
+
+            try {
+                savedTheme = localStorage.getItem("civisphere-theme") || "light";
+            } catch (error) {
+                savedTheme = "light";
+            }
+
+            applyTheme(savedTheme);
+
+            if (themeToggle) {
+
+                themeToggle.addEventListener("click", function () {
+
+                    const currentTheme =
+                        document.documentElement.getAttribute("data-theme");
+
+                    const newTheme =
+                        currentTheme === "dark" ? "light" : "dark";
+
+                    try {
+                        localStorage.setItem("civisphere-theme", newTheme);
+                    } catch (error) {
+                        console.error("Could not save theme preference:", error);
+                    }
+
+                    applyTheme(newTheme);
+
+                });
+
+            }
+
+        })();
+    </script>
+
+    <!-- Existing project JavaScript -->
+    <script src="{{ url_for('static', filename='js/script.js') }}" defer></script>
+
+    {% block extra_js %}{% endblock %}
+
+</body>
+</html>

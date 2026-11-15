@@ -1,0 +1,73 @@
+
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container" style="max-width:650px; margin:40px auto;">
+
+    <h1>Edit Contact</h1>
+    <p>Update the public-service contact information.</p>
+
+    <form method="POST"
+          action="{{ url_for('contacts.edit_contact', contact_id=contact.contact_id) }}">
+
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+        <div style="margin-bottom:20px;">
+            <label>Contact Name *</label>
+            <input type="text"
+                   name="contact_name"
+                   value="{{ contact.contact_name }}"
+                   maxlength="100"
+                   required
+                   style="width:100%; padding:12px; margin-top:8px;">
+        </div>
+
+        <div style="margin-bottom:20px;">
+            <label>Category</label>
+            <select name="category"
+                    style="width:100%; padding:12px; margin-top:8px;">
+
+                {% for item in ['Police', 'Medical', 'Fire Services', 'Government', 'Utilities', 'Other'] %}
+
+                    <option value="{{ item }}"
+                        {% if contact.category == item %}selected{% endif %}>
+                        {{ item }}
+                    </option>
+
+                {% endfor %}
+
+            </select>
+        </div>
+
+        <div style="margin-bottom:20px;">
+            <label>Phone Number *</label>
+            <input type="tel"
+                   name="phone"
+                   value="{{ contact.phone }}"
+                   maxlength="15"
+                   required
+                   style="width:100%; padding:12px; margin-top:8px;">
+        </div>
+
+        <div style="margin-bottom:20px;">
+            <label>Address</label>
+            <textarea name="address"
+                      rows="4"
+                      style="width:100%; padding:12px; margin-top:8px;">{{ contact.address or '' }}</textarea>
+        </div>
+
+        <button type="submit" style="padding:12px 25px;">
+            Update Contact
+        </button>
+
+        <a href="{{ url_for('contacts.contact_list') }}"
+           style="margin-left:15px;">
+            Cancel
+        </a>
+
+    </form>
+
+</div>
+
+{% endblock %}
